@@ -1,0 +1,62 @@
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 22px; }
+.tab {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 11px 18px;
+  border: 1.5px solid var(--line-2); border-radius: var(--r-full);
+  background: #fff; font-weight: 700;
+}
+.tab:hover { border-color: var(--ink); }
+.tabOn { background: var(--ink); border-color: var(--ink); color: #fff; }
+.hoy { padding: 2px 8px; border-radius: var(--r-full); background: var(--red); color: #fff; font-size: 12px; }
+
+.grid { display: grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: start; }
+.table { overflow: hidden; }
+.tableHead { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 22px 22px 18px; }
+.tableHead h2 { font-family: var(--font-display); font-size: 32px; font-weight: 800; text-transform: uppercase; line-height: 1; }
+.tableHead p { margin-top: 6px; color: var(--mute); font-size: 15px; }
+
+.row { display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; align-items: center; padding: 13px 22px; border-top: 1px solid var(--line); font-size: 16px; }
+.three { grid-template-columns: 1.3fr 1fr 1fr; }
+.rowHead { background: var(--bg-soft); font-size: 12.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.franja { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.franja em { font-style: normal; padding: 2px 8px; border-radius: var(--r-full); background: var(--ink); color: #fff; font-size: 12px; }
+.now { background: var(--red-50); box-shadow: inset 4px 0 0 var(--red); }
+.nowTag { padding: 2px 8px; border-radius: var(--r-full); background: var(--red); color: #fff; font-size: 12px; }
+
+.side { display: grid; gap: 16px; }
+.sideCard { padding: 20px; }
+.sideCard h3 { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-size: 22px; font-weight: 800; text-transform: uppercase; }
+.sideCard h3 svg { width: 22px; height: 22px; color: var(--red); }
+.sideCard ul { display: grid; gap: 14px; margin-top: 14px; }
+.sideCard li { display: flex; gap: 12px; align-items: flex-start; }
+.sideCard strong { display: block; font-size: 15px; }
+.sideCard li div span { display: block; color: var(--mute); font-size: 14px; }
+.ask { padding: 20px; border-radius: var(--r-lg); background: var(--red); color: #fff; }
+.ask p { font-family: var(--font-display); font-size: 22px; font-weight: 800; text-transform: uppercase; line-height: 1.05; margin-bottom: 14px; }
+
+@media (max-width: 980px) { .grid { grid-template-columns: 1fr; } }
+@media (max-width: 560px) {
+  .row { padding: 12px 14px; font-size: 15px; }
+  .three { grid-template-columns: 1fr 1fr; }
+  .three .franja { grid-column: 1 / -1; }
+  .rowHead.three span:first-child { display: none; }
+  .tableHead { padding: 18px 14px 14px; }
+}
+
+.timeline { position: relative; display: grid; gap: 0; max-width: 780px; }
+.timeline li { position: relative; display: flex; align-items: center; gap: 16px; padding: 12px 0; }
+.timeline li:not(:last-child)::after { content: ''; position: absolute; left: 19px; top: 52px; bottom: -12px; width: 3px; background: var(--red); border-radius: 2px; }
+.tlDot {
+  position: relative; z-index: 1; flex: none;
+  display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--red);
+  font-family: var(--font-display); font-weight: 800; font-size: 18px;
+}
+.timeline li:first-child .tlDot, .timeline li:last-child .tlDot { background: var(--ink); border-color: var(--ink); color: #fff; }
+.tlBody { flex: 1; min-width: 0; }
+.tlBody strong { display: block; }
+.tlBody span { color: var(--mute); font-size: 14.5px; }
+.tlTime { flex: none; padding: 6px 12px; border-radius: var(--r-full); background: #fff; border: 1px solid var(--line); font-size: 14px; color: var(--mute); transform: translateY(26px); }
+.tlTime b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.note { display: flex; gap: 10px; margin-top: 26px; max-width: 780px; color: var(--mute); font-size: 15px; }
+.note svg { width: 20px; height: 20px; flex: none; margin-top: 2px; color: var(--red); }

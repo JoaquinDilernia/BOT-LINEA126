@@ -1,0 +1,31 @@
+/* client/src/pages/Recorridos.module.css */
+.page { padding: var(--space-6); max-width: 980px; }
+.header { display: flex; justify-content: space-between; align-items: center; }
+.title { font-size: var(--font-size-lg); font-weight: 700; margin: 0; }
+.subtitle { color: var(--color-text-muted); margin: 6px 0 20px; font-size: var(--font-size-sm); }
+.newBtn { background: var(--color-primary); color: var(--color-text-on-primary); border: 0; border-radius: var(--radius-md); padding: 8px 14px; font-weight: 600; cursor: pointer; }
+.linkBtn { background: none; border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 6px 12px; cursor: pointer; color: var(--color-text); }
+.danger { color: var(--color-error); border-color: var(--color-error); }
+.empty { color: var(--color-text-muted); }
+.list { display: flex; flex-direction: column; gap: 10px; }
+.card { border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 14px; display: flex; justify-content: space-between; align-items: center; background: var(--color-surface); }
+.linea { color: var(--color-text-muted); font-size: var(--font-size-sm); }
+.meta { color: var(--color-text-muted); font-size: var(--font-size-xs); margin-top: 4px; }
+.cardActions { display: flex; gap: 8px; }
+.editor { margin-top: 24px; border: 1px solid var(--color-border); border-radius: var(--radius-lg); padding: 20px; background: var(--color-surface); display: flex; flex-direction: column; gap: 12px; }
+.editor h2 { margin: 0; font-size: 1.15rem; }
+.editor h3 { margin: 12px 0 0; font-size: .95rem; }
+.editor label { display: flex; flex-direction: column; gap: 4px; font-size: var(--font-size-sm); font-weight: 600; }
+.editor input, .editor textarea { border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 8px; font: inherit; color: var(--color-text); }
+.row { display: flex; gap: 12px; }
+.row label { flex: 1; }
+.check { flex-direction: row !important; align-items: center; gap: 6px; }
+.seccionCount { display: flex; align-items: center; gap: 8px; font-size: var(--font-size-sm); }
+.seccionCount button { width: 26px; height: 26px; border: 1px solid var(--color-border); border-radius: var(--radius-sm); cursor: pointer; }
+.seccionRow { display: flex; align-items: center; gap: 8px; }
+.seccionRow input[type=number] { width: 90px; }
+.seccionRow input:not([type=number]) { flex: 1; }
+.paradas { font-family: ui-monospace, monospace; font-size: var(--font-size-sm); }
+.geo { display: flex; align-items: center; gap: 10px; }
+.geoMsg { font-size: var(--font-size-sm); color: var(--color-text-muted); }
+.editorActions { display: flex; gap: 10px; margin-top: 8px; }

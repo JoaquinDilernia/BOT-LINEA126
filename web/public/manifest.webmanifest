@@ -1,0 +1,22 @@
+{
+  "name": "Línea 126 — Cárdenas S.A.",
+  "short_name": "Línea 126",
+  "description": "Recorridos, horarios, tarifas y asistente de la Línea 126.",
+  "lang": "es-AR",
+  "start_url": "./?chat=1#/",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#141414",
+  "theme_color": "#d7141a",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Cómo llego", "url": "./#/como-llego" },
+    { "name": "Hacer un reclamo", "url": "./#/atencion" },
+    { "name": "Horarios", "url": "./#/horarios" }
+  ]
+}

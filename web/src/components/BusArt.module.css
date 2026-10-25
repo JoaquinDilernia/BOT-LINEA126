@@ -1,0 +1,67 @@
+/* Todo lo de acá sólo corre con la clase .animated (hero de Inicio). */
+.wheel { transform-box: view-box; }
+.pitch { transform-box: fill-box; transform-origin: 50% 100%; }
+
+/* Arranque: ruedas más rápidas mientras el colectivo alcanza su lugar */
+.animated .wheel { animation: spinFast .2s linear 8, spin .42s linear 1.6s infinite; }
+
+.animated .pitch { animation: pitch 1.9s cubic-bezier(.22, 1, .36, 1) both; }
+.animated .bounce { animation: bounce 2.6s ease-in-out 1.9s infinite; }
+.animated .shadow { transform-box: fill-box; transform-origin: center; animation: shadow 2.6s ease-in-out 1.9s infinite; }
+.animated .sheen { animation: sheen 5.5s cubic-bezier(.45, 0, .55, 1) 1.2s infinite; }
+.animated .beam { animation: beam 3.2s ease-in-out infinite; }
+.animated .taillight { animation: brake 1.9s ease-out both; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes spinFast { to { transform: rotate(360deg); } }
+
+/* Acelera (trompa arriba), frena al llegar (trompa abajo) y se acomoda */
+@keyframes pitch {
+  0% { transform: rotate(-1.6deg); }
+  45% { transform: rotate(-.6deg); }
+  72% { transform: rotate(1.1deg); }
+  86% { transform: rotate(-.35deg); }
+  100% { transform: rotate(0); }
+}
+
+/* Suspensión sobre el empedrado, con un bache de vez en cuando */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  12% { transform: translateY(-1.4px); }
+  25% { transform: translateY(0); }
+  37% { transform: translateY(-1px); }
+  50% { transform: translateY(.4px); }
+  56% { transform: translateY(-4px); }
+  62% { transform: translateY(1.2px); }
+  70% { transform: translateY(-1.6px); }
+  80% { transform: translateY(0); }
+  90% { transform: translateY(-1px); }
+}
+@keyframes shadow {
+  0%, 100%, 50% { transform: scaleX(1); opacity: .35; }
+  56% { transform: scaleX(.97); opacity: .28; }
+}
+
+@keyframes sheen {
+  0% { transform: skewX(-20deg) translateX(0); }
+  45%, 100% { transform: skewX(-20deg) translateX(1100px); }
+}
+@keyframes beam {
+  0%, 100% { opacity: .85; }
+  50% { opacity: 1; }
+}
+/* Luz de freno encendida mientras frena al llegar */
+@keyframes brake {
+  0%, 55% { fill: #ff5a5f; filter: none; }
+  70%, 88% { fill: #ff1f2a; filter: drop-shadow(0 0 8px #ff2a33); }
+  100% { fill: #ff5a5f; filter: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated .wheel, .animated .pitch, .animated .bounce, .animated .shadow,
+  .animated .sheen, .animated .beam, .animated .taillight { animation: none; }
+}
+
+/* Noche: interior encendido que se derrama por las ventanillas */
+.night { filter: drop-shadow(0 26px 30px rgba(0, 0, 0, .4)) drop-shadow(0 0 24px rgba(255, 200, 100, .3)) !important; }
+.night .beam { opacity: 1; }
