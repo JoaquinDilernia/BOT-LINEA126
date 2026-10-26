@@ -5,7 +5,7 @@
   padding: 7px 16px 7px 7px;
   border: 1.5px solid var(--line-2); border-radius: var(--r-full);
   background: #fff;
-  font-weight: 700; font-size: 15.5px;
+  font-weight: 600; font-size: 15.5px;
   transition: border-color 140ms ease, box-shadow 140ms ease;
 }
 .tab:hover { border-color: var(--ink); }
@@ -14,7 +14,7 @@
 .sentido { display: inline-flex; padding: 4px; border-radius: var(--r-full); background: var(--bg-soft); border: 1px solid var(--line); }
 .sentido button {
   padding: 9px 16px; border: 0; border-radius: var(--r-full);
-  background: transparent; font-weight: 700; font-size: 15px; color: var(--mute);
+  background: transparent; font-weight: 600; font-size: 15px; color: var(--mute);
   transition: background 140ms ease, color 140ms ease;
 }
 .sentido button.on { background: var(--ink); color: #fff; }
@@ -28,7 +28,7 @@
 
 .list { display: flex; flex-direction: column; max-height: 620px; overflow: hidden; }
 .listHead { padding: 16px 16px 12px; border-bottom: 1px solid var(--line); }
-.listHead h2 { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 24px; font-weight: 800; text-transform: uppercase; }
+.listHead h2 { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-size: 24px; font-weight: 700; text-transform: uppercase; }
 .search { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 0 12px; border: 1.5px solid var(--line-2); border-radius: var(--r-md); }
 .search:focus-within { border-color: var(--ink); }
 .search svg { width: 18px; height: 18px; color: var(--faint); flex: none; }
@@ -39,7 +39,7 @@
   display: flex; flex-direction: column; align-items: flex-start; width: 100%;
   margin-top: 10px; padding: 8px 16px;
   border: 0; background: transparent; text-align: left;
-  font-size: 12.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--red);
+  font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--red);
 }
 .secHead span { font-size: 13px; font-weight: 600; letter-spacing: 0; text-transform: none; color: var(--mute); }
 .secHead:hover { background: var(--bg-soft); }
@@ -51,7 +51,7 @@
 .stopName { flex: 1; }
 .stop small { color: var(--faint); font-size: 12.5px; }
 .empty { padding: 20px 16px; color: var(--mute); font-size: 15px; }
-.empty button { border: 0; background: none; color: var(--red); font-weight: 700; text-decoration: underline; }
+.empty button { border: 0; background: none; color: var(--red); font-weight: 600; text-decoration: underline; }
 
 @media (max-width: 980px) {
   .grid { grid-template-columns: 1fr; }
@@ -66,8 +66,8 @@
 /* Ramales */
 .ramales { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .ramal { display: flex; gap: 18px; padding: 22px; }
-.ramalTipo { font-size: 12.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
-.ramal h3 { margin-top: 2px; font-family: var(--font-display); font-size: 24px; font-weight: 800; text-transform: uppercase; }
+.ramalTipo { font-size: 12.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--red); }
+.ramal h3 { margin-top: 2px; font-family: var(--font-display); font-size: 24px; font-weight: 700; text-transform: uppercase; }
 .ramal p { margin-top: 6px; color: var(--mute); font-size: 15.5px; }
 .ramalHorario { display: flex; align-items: flex-start; gap: 8px; color: var(--ink) !important; font-weight: 600; }
 .ramalHorario svg { width: 18px; height: 18px; flex: none; margin-top: 3px; color: var(--red); }
@@ -80,11 +80,11 @@
   border-radius: var(--r-lg);
   background: var(--ink); color: #fff;
 }
-.expreso h3 { font-family: var(--font-display); font-size: 24px; font-weight: 800; text-transform: uppercase; }
+.expreso h3 { font-family: var(--font-display); font-size: 24px; font-weight: 700; text-transform: uppercase; }
 .expreso p { margin-top: 6px; color: #c9c9cc; }
 
 .help {
   display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px;
   margin-top: 36px; text-align: center;
 }
-.help p { font-family: var(--font-display); font-weight: 800; font-size: 26px; text-transform: uppercase; }
+.help p { font-family: var(--font-display); font-weight: 700; font-size: 26px; text-transform: uppercase; }

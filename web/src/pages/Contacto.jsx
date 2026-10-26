@@ -24,7 +24,7 @@ export default function Contacto() {
   return (
     <>
       <PageHero kicker="Contacto" title="Hablemos">
-        La forma más rápida es el asistente virtual: responde al instante, las 24 horas, y registra reclamos con número de seguimiento.
+        La forma más rápida es el chat: responde al instante, las 24 horas, y registra reclamos con número de seguimiento.
       </PageHero>
 
       <section className="section">
@@ -32,14 +32,9 @@ export default function Contacto() {
           <div className={s.cards}>
             <button type="button" className={`reveal ${s.card} ${s.cardRed}`} onClick={() => openChat()}>
               <IconChat />
-              <strong>Asistente virtual</strong>
+              <strong>Chateá con nosotros</strong>
               <span>Consultas y reclamos las 24 h</span>
             </button>
-            <a className={`reveal ${s.card}`} href={EMPRESA.telefono0800Href}>
-              <IconPhone />
-              <strong>{EMPRESA.telefono0800}</strong>
-              <span>Atención al pasajero · gratuito</span>
-            </a>
             <a className={`reveal ${s.card}`} href={EMPRESA.telefonoHref}>
               <IconPhone />
               <strong>{EMPRESA.telefono}</strong>
@@ -79,7 +74,7 @@ export default function Contacto() {
           <IconShield />
           <div>
             <h2>¿Tu reclamo no fue resuelto?</h2>
-            <p>La 126 es una línea nacional fiscalizada por la Comisión Nacional de Regulación del Transporte. Podés presentar tu denuncia en la CNRT al 0800-333-0300 o en argentina.gob.ar/cnrt.</p>
+            <p>La 126 es una línea nacional fiscalizada por la Comisión Nacional de Regulación del Transporte. Podés presentar tu denuncia en la CNRT en argentina.gob.ar/cnrt.</p>
           </div>
           <a className="btn btn--dark" href="https://www.argentina.gob.ar/cnrt" target="_blank" rel="noreferrer">Ir a la CNRT</a>
         </div>

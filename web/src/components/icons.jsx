@@ -30,5 +30,5 @@ export const IconInfo = I(<><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12
 
 export const CATEGORIA_ICON = {
   clock: IconClock, stop: IconStop, face: IconFace, alert: IconAlert,
-  bus: IconBus, card: IconCard, bag: IconBag, chat: IconChat,
+  bus: IconBus, card: IconCard, bag: IconBag, chat: IconChat, shield: IconShield,
 };

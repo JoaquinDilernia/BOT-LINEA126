@@ -1,21 +1,11 @@
 import { useEffect, useState } from 'react';
 import { authFetch, BASE_URL } from '../lib/api';
+import { CATEGORIAS, RAMALES, categoriaLabel } from '../lib/reclamos';
 import styles from './Reclamos.module.css';
 
 const PRIORIDADES = ['baja', 'media', 'alta', 'urgente'];
 const ESTADOS = ['abierto', 'en_progreso', 'resuelto', 'cerrado'];
-const CATEGORIAS = [
-  { id: 'demora', label: 'Demora' },
-  { id: 'mal_trato', label: 'Mal trato' },
-  { id: 'manejo_peligroso', label: 'Manejo peligroso' },
-  { id: 'unidad_mal_estado', label: 'Unidad en mal estado' },
-  { id: 'cobro_indebido', label: 'Cobro indebido' },
-  { id: 'objeto_perdido', label: 'Objeto perdido' },
-  { id: 'no_realizo_parada', label: 'No realizó la parada' },
-  { id: 'otro', label: 'Otro' },
-];
-const categoriaLabel = id => CATEGORIAS.find(c => c.id === id)?.label ?? id;
-const EMPTY_RECLAMO = { titulo: '', descripcion: '', prioridad: 'media', categoria: 'otro', contactId: '' };
+const EMPTY_RECLAMO = { titulo: '', descripcion: '', prioridad: 'media', categoria: 'mal_trato', contactId: '', numeroUnidad: '', ramal: '' };
 
 function TicketImage({ mediaId }) {
   const token = localStorage.getItem('linea126_token');
@@ -36,6 +26,9 @@ export default function Reclamos() {
   const [filterEstado, setFilterEstado] = useState('');
   const [filterPrioridad, setFilterPrioridad] = useState('');
   const [filterCategoria, setFilterCategoria] = useState('');
+  // Bandeja de graves por defecto: los comunes se responden solos y viven
+  // en Gestión de reclamos.
+  const [filterGravedad, setFilterGravedad] = useState('grave');
   const [showNew, setShowNew] = useState(false);
   const [newTicket, setNewTicket] = useState(EMPTY_RECLAMO);
   const [newImage, setNewImage] = useState(null); // { mediaId, mimeType } tras subir
@@ -46,7 +39,7 @@ export default function Reclamos() {
   const [responseText, setResponseText] = useState('');
   const [savingResponse, setSavingResponse] = useState(false);
 
-  useEffect(() => { load(); }, [filterEstado, filterPrioridad, filterCategoria]);
+  useEffect(() => { load(); }, [filterEstado, filterPrioridad, filterCategoria, filterGravedad]);
 
   async function load() {
     setLoading(true);
@@ -55,6 +48,7 @@ export default function Reclamos() {
       if (filterEstado) params.set('estado', filterEstado);
       if (filterPrioridad) params.set('prioridad', filterPrioridad);
       if (filterCategoria) params.set('categoria', filterCategoria);
+      if (filterGravedad) params.set('gravedad', filterGravedad);
       const r = await authFetch(BASE_URL + '/api/reclamos?' + params.toString());
       if (r.ok) {
         const data = await r.json();
@@ -163,8 +157,8 @@ export default function Reclamos() {
       <aside className={styles.list}>
         <div className={styles.listHeader}>
           <div>
-            <h1 className={styles.title}>Reclamos</h1>
-            <p className={styles.subtitle}>El pasajero reclama acá — no en CNRT</p>
+            <h1 className={styles.title}>{filterGravedad === 'grave' ? 'Reclamos graves' : 'Reclamos'}</h1>
+            <p className={styles.subtitle}>{filterGravedad === 'grave' ? 'Los únicos que se responden a mano' : 'Incluye los comunes, que se respondieron solos'}</p>
           </div>
           <div className={styles.headerActions}>
             <button className={styles.refreshBtn} onClick={load} title="Actualizar">🔄</button>
@@ -172,6 +166,11 @@ export default function Reclamos() {
           </div>
         </div>
         <div className={styles.filters}>
+          <select value={filterGravedad} onChange={e => setFilterGravedad(e.target.value)}>
+            <option value="grave">Sólo graves</option>
+            <option value="comun">Sólo comunes</option>
+            <option value="">Todos</option>
+          </select>
           <select value={filterEstado} onChange={e => setFilterEstado(e.target.value)}>
             <option value="">Todos los estados</option>
             {ESTADOS.map(e => <option key={e} value={e}>{e.replace('_', ' ')}</option>)}
@@ -198,6 +197,7 @@ export default function Reclamos() {
                 <span className={`${styles.badge} ${styles['prio_' + t.prioridad]}`}>{t.prioridad}</span>
                 <span className={`${styles.badge} ${styles['estado_' + t.estado]}`}>{t.estado.replace('_', ' ')}</span>
                 {t.categoria && <span className={styles.badge}>{categoriaLabel(t.categoria)}</span>}
+                {t.numeroUnidad && <span className={styles.badge}>Int. {t.numeroUnidad}</span>}
               </div>
             </button>
           ))
@@ -227,6 +227,19 @@ export default function Reclamos() {
                 <span>Categoría</span>
                 <select value={newTicket.categoria} onChange={e => setNewTicket({ ...newTicket, categoria: e.target.value })}>
                   {CATEGORIAS.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+                </select>
+              </label>
+            </div>
+            <div className={styles.formRow}>
+              <label className={styles.field}>
+                <span>N° de interno</span>
+                <input value={newTicket.numeroUnidad} onChange={e => setNewTicket({ ...newTicket, numeroUnidad: e.target.value.replace(/\D/g, '') })} placeholder="Ej: 36" inputMode="numeric" />
+              </label>
+              <label className={styles.field}>
+                <span>Ramal</span>
+                <select value={newTicket.ramal} onChange={e => setNewTicket({ ...newTicket, ramal: e.target.value })}>
+                  <option value="">—</option>
+                  {RAMALES.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
               </label>
             </div>
@@ -292,6 +305,13 @@ export default function Reclamos() {
                 />
               </label>
               <label className={styles.field}>
+                <span>Ramal</span>
+                <select value={selected.ramal ?? ''} onChange={e => updateSelected({ ramal: e.target.value })}>
+                  <option value="">—</option>
+                  {RAMALES.map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </label>
+              <label className={styles.field}>
                 <span>N° interno de la unidad</span>
                 <input
                   key={`unidad-${selected.id}`}
@@ -301,7 +321,7 @@ export default function Reclamos() {
                 />
               </label>
             </div>
-            <p className={styles.respondHint}>Legajo y unidad quedan disponibles para armar estadísticas por chofer/unidad en Estadísticas más adelante.</p>
+            <p className={styles.respondHint}>Chofer, interno y ramal alimentan las estadísticas de Gestión de reclamos.</p>
 
             <p className={styles.detailMeta}><strong>Creado por:</strong> {selected.createdBy === 'bot' ? '🤖 Bot' : selected.createdBy}</p>
             <p className={styles.detailMeta}><strong>Asignado a:</strong> {selected.assignedTo ?? 'Sin asignar'}</p>
@@ -323,7 +343,7 @@ export default function Reclamos() {
                 <h3>Respuestas enviadas al pasajero</h3>
                 {selected.respuestas.map((r, i) => (
                   <div key={i} className={styles.respuestaItem}>
-                    <span className={styles.commentAuthor}>{r.autor}</span>
+                    <span className={styles.commentAuthor}>{r.automatica ? '🤖 Respuesta automática' : r.autor}</span>
                     <p className={styles.commentText}>{r.texto}</p>
                   </div>
                 ))}

@@ -1,0 +1,30 @@
+/* Seguimiento de reclamos (Reclamos e Inicio) */
+.track { padding: 22px; }
+.trackForm { display: flex; gap: 12px; align-items: flex-end; }
+.trackForm .field, .trackForm :global(.field) { flex: 1; }
+.trackForm input { text-transform: uppercase; letter-spacing: .04em; }
+.trackError { margin-top: 14px; padding: 12px 14px; border-radius: var(--r-md); background: var(--red-50); color: var(--red-700); font-size: 15px; }
+.trackResult { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line); }
+.trackTop { display: flex; justify-content: space-between; gap: 16px; align-items: flex-start; }
+.trackNum { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: .06em; color: var(--red); }
+.trackTop h3 { font-size: 19px; margin-top: 2px; }
+.trackTop p { color: var(--mute); font-size: 14.5px; margin-top: 4px; }
+.badge { flex: none; padding: 5px 12px; border-radius: var(--r-full); font-size: 13px; font-weight: 700; background: var(--warn-50); color: var(--warn); }
+.b_en_progreso { background: #e8f0fe; color: #1a56c4; }
+.b_resuelto, .b_cerrado { background: var(--ok-50); color: var(--ok); }
+.progress { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 18px; }
+.progress li { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--faint); text-align: center; position: relative; }
+.progress li:not(:last-child)::after { content: ''; position: absolute; top: 15px; left: calc(50% + 20px); right: calc(-50% + 20px); height: 3px; border-radius: 2px; background: var(--line); }
+.progress li.done:has(+ li.done)::after { background: var(--ok); }
+.progress li > span { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--bg-soft); border: 2px solid var(--line-2); font-size: 14px; }
+.progress li.done { color: var(--ink); }
+.progress li.done > span { background: var(--ok); border-color: var(--ok); color: #fff; }
+.progress li > span svg { width: 16px; height: 16px; }
+.answers { margin-top: 20px; }
+.answers h4 { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.answers blockquote { margin-top: 10px; padding: 14px 16px; border-left: 4px solid var(--red); border-radius: 0 var(--r-md) var(--r-md) 0; background: var(--bg-soft); }
+.answers small { display: block; margin-top: 6px; color: var(--faint); }
+@media (max-width: 480px) {
+  .trackForm { flex-direction: column; align-items: stretch; }
+  .trackTop { flex-direction: column; }
+}

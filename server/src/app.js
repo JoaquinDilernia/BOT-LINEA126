@@ -22,6 +22,8 @@ import tarifaRoutes from './routes/tarifa.routes.js';
 import recorridoRoutes from './routes/recorrido.routes.js';
 import postulacionRoutes from './routes/postulacion.routes.js';
 import ticketRoutes from './routes/ticket.routes.js';
+import unidadRoutes from './routes/unidad.routes.js';
+import novedadRoutes from './routes/novedad.routes.js';
 import campaignRoutes from './routes/campaign.routes.js';
 import redirectRoutes from './routes/redirect.routes.js';
 import { seedAgentsIfNeeded } from './services/auth.service.js';
@@ -107,6 +109,10 @@ app.use('/api/areas',         requireAuth, areaRoutes);
 // Sin restricción de rol adicional — cualquier agente autenticado puede ver,
 // crear y responder reclamos (panel de Reclamos).
 app.use('/api/reclamos',      requireAuth, ticketRoutes);
+// Flota (internos válidos para tomar reclamos) y novedades (banner del sitio
+// + contexto del bot). Lectura para cualquier agente; escritura dentro del router.
+app.use('/api/unidades',      requireAuth, unidadRoutes);
+app.use('/api/novedades',     requireAuth, novedadRoutes);
 // Lectura abierta a cualquier rol autenticado; alta/baja/edición requiere admin.
 app.use('/api/tarifas',       requireAuth, tarifaRoutes);
 app.use('/api/recorridos',    requireAuth, recorridoRoutes);

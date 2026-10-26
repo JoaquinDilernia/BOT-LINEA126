@@ -51,11 +51,23 @@ Ejemplo: "[CERRAR] ¡Con mucho gusto! Si necesitás algo más, escribinos cuando
 Usá [CERRAR] solo cuando estés seguro de que la conversación terminó.`;
 }
 
-function buildReclamoInstructions(businessName) {
+export const CATEGORIAS_PROMPT = 'demora|mal_trato|manejo_peligroso|unidad_mal_estado|cobro_indebido|objeto_perdido|no_realizo_parada|accidente|otro';
+
+// El interno es obligatorio (pedido de la línea): sin él el reclamo no se
+// puede atribuir a una unidad ni a un chofer. `internos` es la flota cargada
+// en el panel, compactada ("1-120, 130"); vacía = todavía no la cargaron y
+// sólo se exige que el pasajero dé un número.
+function buildReclamoInstructions(businessName, { internos = '', categoriasSinInterno = ['objeto_perdido', 'otro'] } = {}) {
+  const flota = internos
+    ? `Números de interno VÁLIDOS de la flota: ${internos}. Si el pasajero da un número que no está en esta lista, decile con amabilidad que ese interno no figura en la flota de la línea y pedile que lo revise — NO registres el reclamo con un interno que no está en la lista.`
+    : 'Todavía no hay una lista de internos cargada: alcanza con que el pasajero dé un número.';
   return `
-IMPORTANTE — RECLAMOS: Cuando un pasajero reporta un reclamo (demora, mal trato, incidente en una unidad, cobro indebido, no realizó la parada) o un objeto perdido, conversá primero para juntar un título breve y una descripción clara. NUNCA preguntes de qué línea o servicio se trata — este canal es exclusivamente de ${businessName}, ya se sabe. Para un reclamo sobre un viaje, preguntá SIEMPRE el lugar (parada, calle o zona) y el horario aproximado en que ocurrió — sin esos dos datos el equipo no puede identificar el viaje ni al chofer, así que no los saltees aunque el pasajero no los mencione espontáneamente. Si el pasajero menciona el número interno de la unidad o el legajo/nombre del chofer, incluilo también en la descripción — es información valiosa aunque no sea obligatoria. Para un objeto perdido, priorizá una descripción clara del objeto y dónde/cuándo viajaba el pasajero; lugar y horario siguen siendo útiles pero el objeto es el dato central. Antes o junto con el marcador, avisale EXPLÍCITAMENTE en tu texto que le estás registrando el reclamo en el sistema — nunca lo hagas en silencio. Recién ahí, en una línea separada (invisible para el cliente), agregá:
-[CREAR_RECLAMO:{"titulo":"...","descripcion":"...","prioridad":"baja|media|alta|urgente","categoria":"demora|mal_trato|manejo_peligroso|unidad_mal_estado|cobro_indebido|objeto_perdido|no_realizo_parada|otro"}]
-El JSON tiene que ser válido y tener exactamente esas 4 claves. La categoría la elegís vos según lo que más se ajuste a lo que cuenta el pasajero — usá "otro" solo si de verdad ninguna encaja. Si todavía no tenés información suficiente para un título/descripción claros, seguí preguntando antes de usar el marcador — nunca lo generes con datos vacíos o inventados. Después de crear el reclamo el sistema le va a dar al pasajero un número de reclamo automáticamente — vos no inventes ni digas ningún número, eso lo agrega el sistema después de tu respuesta.`;
+IMPORTANTE — RECLAMOS: Cuando un pasajero reporta un reclamo (demora o falta de frecuencia, mal trato, manejo peligroso, accidente, unidad en mal estado, cobro indebido, no realizó la parada) o un objeto perdido, conversá primero para juntar un título breve y una descripción clara. NUNCA preguntes de qué línea o servicio se trata — este canal es exclusivamente de ${businessName}, ya se sabe. Para un reclamo sobre un viaje, preguntá SIEMPRE el lugar (parada, calle o zona), el horario aproximado y el ramal (letra del cartel: A, B, C, D, E o F) — sin esos datos no se puede identificar el viaje ni al chofer.
+NÚMERO DE INTERNO — OBLIGATORIO: Para tomar un reclamo necesitás SÍ O SÍ el número de interno del colectivo (el número que está pintado en el frente, en los laterales, atrás y adentro cerca del chofer). Pedilo siempre. Si el pasajero no lo sabe, explicale dónde lo puede ver y que sin ese número no podemos registrar el reclamo; no lo registres sin interno. La única excepción son estas categorías, donde el interno es opcional: ${categoriasSinInterno.join(', ')}.
+${flota}
+Para un objeto perdido, priorizá una descripción clara del objeto y dónde/cuándo viajaba el pasajero. Si el pasajero menciona el legajo o el nombre del chofer, incluilo en la descripción. Antes o junto con el marcador, avisale EXPLÍCITAMENTE en tu texto que le estás registrando el reclamo en el sistema — nunca lo hagas en silencio. Recién ahí, en una línea separada (invisible para el cliente), agregá:
+[CREAR_RECLAMO:{"titulo":"...","descripcion":"...","prioridad":"baja|media|alta|urgente","categoria":"${CATEGORIAS_PROMPT}","interno":"36","ramal":"A"}]
+El JSON tiene que ser válido y tener exactamente esas 6 claves ("interno" y "ramal" van como texto; vacíos "" sólo si de verdad no aplican). La categoría la elegís vos según lo que más se ajuste a lo que cuenta el pasajero — usá "otro" solo si de verdad ninguna encaja. Si todavía no tenés información suficiente, seguí preguntando antes de usar el marcador — nunca lo generes con datos vacíos o inventados. Después de crear el reclamo el sistema le da al pasajero el número de reclamo y le dice cómo sigue — vos no inventes ni digas ningún número ni prometas plazos, eso lo agrega el sistema después de tu respuesta.`;
 }
 
 function callAnthropicAPIOnce(payload) {
@@ -137,9 +149,9 @@ export async function generateConversationSummary(messages) {
 }
 
 export async function generateBotResponse(userMessage, conversationHistory, context = {}) {
-  const { knowledgeBase = '', customerContext = null, availableLabels = [], botConfig = {}, imageData = null, tarifario = '', recorridos = '' } = context;
+  const { knowledgeBase = '', customerContext = null, availableLabels = [], botConfig = {}, imageData = null, tarifario = '', recorridos = '', reclamos = {}, novedades = '' } = context;
 
-  const systemContent = buildSystemPrompt(botConfig, knowledgeBase, customerContext, availableLabels, tarifario, recorridos);
+  const systemContent = buildSystemPrompt(botConfig, knowledgeBase, customerContext, availableLabels, tarifario, recorridos, { reclamos, novedades });
   const messages = buildMessages(conversationHistory, userMessage, imageData);
 
   const response = await callAnthropicAPI({
@@ -153,7 +165,7 @@ export async function generateBotResponse(userMessage, conversationHistory, cont
   return extractText(response);
 }
 
-export function buildSystemPrompt(botConfig = {}, knowledgeBase, customerContext, availableLabels = [], tarifario = '', recorridos = '') {
+export function buildSystemPrompt(botConfig = {}, knowledgeBase, customerContext, availableLabels = [], tarifario = '', recorridos = '', { reclamos = {}, novedades = '' } = {}) {
   const botName = botConfig.botName || 'Asistente';
   const businessName = botConfig.businessName || 'Línea 126';
   const personality = botConfig.botPersonality ||
@@ -165,7 +177,7 @@ Nunca inventás información sobre servicios, precios, plazos, procesos o links 
 
   let prompt = `Sos el asistente virtual de ${businessName}. Tu nombre es ${botName}.\n${personality}`;
   prompt += buildNoHumanInstructions();
-  prompt += buildReclamoInstructions(businessName);
+  prompt += buildReclamoInstructions(businessName, reclamos);
   if (tarifario) {
     prompt += `\n\n--- CUADRO TARIFARIO (fuente de verdad para precios) ---\n${tarifario}`;
   }
@@ -193,6 +205,9 @@ Podés combinar varias etiquetas si aplica.`;
   // en un bloque cacheado (~10% del costo); lo que depende del contacto va
   // aparte, al final. No meter nada variable en el primer bloque.
   const blocks = [{ type: 'text', text: prompt, cache_control: { type: 'ephemeral' } }];
+  if (novedades) {
+    blocks.push({ type: 'text', text: `--- NOVEDADES VIGENTES (desvíos, cortes, paros, avisos de la empresa) ---\n${novedades}\n\nIMPORTANTE — NOVEDADES: Son avisos cargados por la línea y tienen prioridad sobre los recorridos y horarios habituales. Si la consulta del pasajero (recorrido, parada, horario, cómo llegar) se ve afectada por alguna, avisale primero de la novedad y después respondé.` });
+  }
   if (customerContext) blocks.push({ type: 'text', text: `--- PERFIL DEL CONTACTO ---\n${customerContext}` });
   return blocks;
 }

@@ -3,6 +3,7 @@ import { listUsers } from './auth.service.js';
 import { getAllTemplates } from './template.service.js';
 import { sendWhatsAppTemplate, sendWhatsAppMessage } from './meta.service.js';
 import { appendMessage } from './conversation.service.js';
+import { monthKey } from './reclamoStats.js';
 
 const COLLECTION = 'bot-linea126_reclamos';
 const COUNTER_COLLECTION = 'bot-linea126_counters';
@@ -13,18 +14,64 @@ const RESOLVED_TEMPLATE_NAME = 'ticket_resuelto';
 // (no un CRUD como Áreas) porque lo que importa acá es que sea siempre el
 // mismo set chico para que las estadísticas por categoría tengan sentido.
 export const CATEGORIAS_RECLAMO = [
-  { id: 'demora', label: 'Demora' },
+  { id: 'demora', label: 'Demora / falta de frecuencia' },
   { id: 'mal_trato', label: 'Mal trato' },
   { id: 'manejo_peligroso', label: 'Manejo peligroso' },
   { id: 'unidad_mal_estado', label: 'Unidad en mal estado' },
   { id: 'cobro_indebido', label: 'Cobro indebido' },
   { id: 'objeto_perdido', label: 'Objeto perdido' },
   { id: 'no_realizo_parada', label: 'No realizó la parada' },
+  { id: 'accidente', label: 'Accidente o seguridad' },
   { id: 'otro', label: 'Otro' },
 ];
 const CATEGORIA_IDS = CATEGORIAS_RECLAMO.map(c => c.id);
 
 const isWebContact = (contactId) => String(contactId ?? '').startsWith('web:');
+
+// --- Reclamos graves vs. comunes ----------------------------------------------
+// Pedido de la línea: los reclamos comunes se responden solos (quedan
+// registrados igual, con todos los datos, para las estadísticas) y sólo los
+// graves llegan a la bandeja del panel para que alguien los responda a mano.
+// Qué categorías cuentan como graves se configura desde el panel.
+const CONFIG_REF = () => getDb().collection('bot-linea126_config').doc('reclamos');
+
+export const DEFAULT_RECLAMOS_CONFIG = {
+  categoriasGraves: ['mal_trato', 'manejo_peligroso', 'accidente'],
+  respuestaAutomatica: '¡Gracias por avisarnos! Tu reclamo quedó registrado con los datos de la unidad y entra en el control mensual del servicio: lo revisamos con el área de tráfico para corregir lo que haga falta. No tenés que hacer nada más.',
+  // Sin interno el reclamo no se puede atribuir a una unidad ni a un chofer.
+  // Objeto perdido y sugerencias quedan afuera: muchas veces el pasajero no
+  // lo vio y igual queremos registrar el caso.
+  categoriasSinInterno: ['objeto_perdido', 'otro'],
+};
+
+export async function getReclamosConfig() {
+  const doc = await CONFIG_REF().get();
+  return { ...DEFAULT_RECLAMOS_CONFIG, ...(doc.exists ? doc.data() : {}) };
+}
+
+export async function updateReclamosConfig({ categoriasGraves, respuestaAutomatica, categoriasSinInterno } = {}) {
+  const update = { updatedAt: new Date() };
+  if (Array.isArray(categoriasGraves)) update.categoriasGraves = categoriasGraves.filter(c => CATEGORIA_IDS.includes(c));
+  if (Array.isArray(categoriasSinInterno)) update.categoriasSinInterno = categoriasSinInterno.filter(c => CATEGORIA_IDS.includes(c));
+  if (typeof respuestaAutomatica === 'string' && respuestaAutomatica.trim()) update.respuestaAutomatica = respuestaAutomatica.trim().slice(0, 1500);
+  await CONFIG_REF().set(update, { merge: true });
+  return getReclamosConfig();
+}
+
+/** Un reclamo urgente siempre es grave, aunque su categoría no lo sea. */
+export function gravedadDe({ categoria, prioridad }, config = DEFAULT_RECLAMOS_CONFIG) {
+  return prioridad === 'urgente' || config.categoriasGraves.includes(categoria) ? 'grave' : 'comun';
+}
+
+/** "Mal trato" / "mal_trato" / "MAL TRATO" → 'mal_trato'. Lo no reconocido → 'otro'. */
+export function normalizeCategoria(value) {
+  const v = String(value ?? '').trim().toLowerCase();
+  if (CATEGORIA_IDS.includes(v)) return v;
+  const plain = (x) => x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z]+/g, ' ').trim();
+  const pv = plain(v);
+  const match = CATEGORIAS_RECLAMO.find(c => plain(c.label) === pv || plain(c.id) === pv || plain(c.label).startsWith(pv) && pv.length >= 4);
+  return match?.id ?? 'otro';
+}
 
 // Lo que puede ver cualquiera que tenga el número de reclamo desde el sitio
 // ("Seguí tu reclamo"): estado y respuestas, nunca el contacto, el legajo
@@ -66,13 +113,24 @@ async function nextReclamoNumero() {
 // Filtra en memoria en vez de con `.where()` encadenados: el volumen esperado
 // de reclamos es bajo y así se evita necesitar un índice compuesto para
 // cada combinación de estado+prioridad+orderBy.
-export async function getAllTickets({ estado, prioridad, categoria } = {}) {
+// Reclamos anteriores a la separación grave/común no tienen `gravedad`
+// guardada: se calcula al vuelo con la config actual.
+export async function getAllTickets({ estado, prioridad, categoria, gravedad, origen, mes } = {}) {
   const db = getDb();
-  const snap = await db.collection(COLLECTION).orderBy('createdAt', 'desc').get();
-  let tickets = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  const [snap, config] = await Promise.all([
+    db.collection(COLLECTION).orderBy('createdAt', 'desc').get(),
+    getReclamosConfig(),
+  ]);
+  let tickets = snap.docs.map(d => {
+    const t = { id: d.id, ...d.data() };
+    return { ...t, gravedad: t.gravedad ?? gravedadDe(t, config) };
+  });
   if (estado) tickets = tickets.filter(t => t.estado === estado);
   if (prioridad) tickets = tickets.filter(t => t.prioridad === prioridad);
   if (categoria) tickets = tickets.filter(t => t.categoria === categoria);
+  if (gravedad) tickets = tickets.filter(t => t.gravedad === gravedad);
+  if (origen) tickets = tickets.filter(t => (t.origen ?? (t.createdBy === 'bot' ? 'bot' : 'panel')) === origen);
+  if (mes) tickets = tickets.filter(t => monthKey(t.fechaHecho ?? t.createdAt) === mes);
   return tickets;
 }
 
@@ -92,9 +150,15 @@ export async function getDefaultAssignee() {
   return admin?.email ?? null;
 }
 
-export async function createTicket({ titulo, descripcion, contactId = null, prioridad = 'media', categoria = 'otro', imagenes = [], createdBy }) {
+// Los comunes nacen ya respondidos (respuesta automática de la config) y
+// los graves quedan abiertos en la bandeja. `numeroUnidad` es el interno.
+export async function createTicket({ titulo, descripcion, contactId = null, prioridad = 'media', categoria = 'otro', imagenes = [], createdBy, numeroUnidad = '', ramal = '', origen }) {
   const db = getDb();
-  const [assignedTo, numero] = await Promise.all([getDefaultAssignee(), nextReclamoNumero()]);
+  const [assignedTo, numero, config] = await Promise.all([getDefaultAssignee(), nextReclamoNumero(), getReclamosConfig()]);
+  const cat = CATEGORIA_IDS.includes(categoria) ? categoria : 'otro';
+  const gravedad = gravedadDe({ categoria: cat, prioridad }, config);
+  const now = new Date();
+  const auto = gravedad === 'comun';
   const ticket = {
     numero,
     titulo,
@@ -102,24 +166,75 @@ export async function createTicket({ titulo, descripcion, contactId = null, prio
     contactId,
     conversationId: contactId,
     prioridad,
-    categoria: CATEGORIA_IDS.includes(categoria) ? categoria : 'otro',
+    categoria: cat,
+    gravedad,
+    origen: origen ?? (createdBy === 'bot' ? 'bot' : 'panel'),
     legajoChofer: '',
-    numeroUnidad: '',
-    estado: 'abierto',
+    numeroUnidad: String(numeroUnidad ?? '').trim(),
+    ramal: String(ramal ?? '').trim().toUpperCase().slice(0, 2),
+    estado: auto ? 'resuelto' : 'abierto',
     imagenes,
     createdBy,
     assignedTo,
     comentarios: [],
-    respuestas: [],
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    resolvedAt: null,
+    respuestas: auto ? [{ autor: 'Respuesta automática', texto: config.respuestaAutomatica, automatica: true, createdAt: now }] : [],
+    ...(auto && { notificationStatus: 'auto' }),
+    createdAt: now,
+    updatedAt: now,
+    resolvedAt: auto ? now : null,
   };
   const ref = await db.collection(COLLECTION).add(ticket);
   return { id: ref.id, ...ticket };
 }
 
-export async function updateTicket(id, { titulo, descripcion, prioridad, categoria, legajoChofer, numeroUnidad, estado, assignedTo, imagenes } = {}) {
+// Carga mensual para estadísticas: la línea completa chofer/interno/ramal de
+// cada reclamo (o carga reclamos que le llegaron por otros medios). Estos
+// registros NO tienen contacto ni número público: nunca se le responde a
+// nadie desde acá, sólo alimentan las estadísticas.
+export async function createCargaBatch(rows, createdBy) {
+  const db = getDb();
+  const config = await getReclamosConfig();
+  const errores = [];
+  const docs = [];
+  rows.slice(0, 500).forEach((row, i) => {
+    const fecha = row.fecha ? new Date(row.fecha) : null;
+    if (!fecha || Number.isNaN(fecha.getTime())) { errores.push({ fila: i + 1, error: 'Fecha inválida' }); return; }
+    const categoria = normalizeCategoria(row.categoria);
+    const now = new Date();
+    docs.push({
+      numero: null,
+      titulo: CATEGORIAS_RECLAMO.find(c => c.id === categoria)?.label ?? 'Reclamo',
+      descripcion: String(row.descripcion ?? '').trim().slice(0, 1000),
+      contactId: null,
+      conversationId: null,
+      prioridad: 'media',
+      categoria,
+      gravedad: gravedadDe({ categoria }, config),
+      origen: 'carga',
+      legajoChofer: String(row.legajoChofer ?? '').trim().slice(0, 60),
+      numeroUnidad: String(row.numeroUnidad ?? '').trim().slice(0, 10),
+      ramal: String(row.ramal ?? '').trim().toUpperCase().slice(0, 2),
+      fechaHecho: fecha,
+      estado: 'cerrado',
+      imagenes: [],
+      createdBy,
+      assignedTo: null,
+      comentarios: [],
+      respuestas: [],
+      createdAt: now,
+      updatedAt: now,
+      resolvedAt: null,
+    });
+  });
+  for (let i = 0; i < docs.length; i += 450) {
+    const batch = db.batch();
+    for (const d of docs.slice(i, i + 450)) batch.set(db.collection(COLLECTION).doc(), d);
+    await batch.commit();
+  }
+  return { creados: docs.length, errores };
+}
+
+export async function updateTicket(id, { titulo, descripcion, prioridad, categoria, legajoChofer, numeroUnidad, ramal, gravedad, estado, assignedTo, imagenes } = {}) {
   const db = getDb();
   const docRef = db.collection(COLLECTION).doc(id);
   const before = await docRef.get();
@@ -133,6 +248,8 @@ export async function updateTicket(id, { titulo, descripcion, prioridad, categor
   if (categoria !== undefined) update.categoria = CATEGORIA_IDS.includes(categoria) ? categoria : 'otro';
   if (legajoChofer !== undefined) update.legajoChofer = legajoChofer;
   if (numeroUnidad !== undefined) update.numeroUnidad = numeroUnidad;
+  if (ramal !== undefined) update.ramal = String(ramal).trim().toUpperCase().slice(0, 2);
+  if (gravedad === 'grave' || gravedad === 'comun') update.gravedad = gravedad;
   if (assignedTo !== undefined) update.assignedTo = assignedTo;
   if (imagenes !== undefined) update.imagenes = imagenes;
 

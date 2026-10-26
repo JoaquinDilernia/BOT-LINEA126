@@ -27,28 +27,26 @@ function PageLoader() {
 // minRole: undefined = all, 'atencion_cliente' = not operador, 'admin' = only admin
 // Grupos del menú: el primero (sin título) es el uso diario; los demás tienen
 // título y se pueden colapsar.
+// Adaptado a la línea: sin Áreas, Etiquetas, Respuestas rápidas, Contactos,
+// Difusiones ni Plantillas (vienen de los bots de WhatsApp y acá sólo
+// confunden). Las rutas siguen existiendo por si se activa WhatsApp.
 const NAV_GROUPS = [
   { id: 'main', items: [
     { to: '/dashboard',     label: 'Dashboard',       icon: IconDashboard,  minRole: 'atencion_cliente' },
     { to: '/conversations', label: 'Conversaciones',  icon: IconChat },
-    { to: '/reclamos',      label: 'Reclamos',        icon: IconTicket },
+    { to: '/reclamos',      label: 'Reclamos graves', icon: IconTicket },
+    { to: '/gestion',       label: 'Gestión de reclamos', icon: IconChart },
     { to: '/stats',         label: 'Estadísticas',    icon: IconChart,      minRole: 'atencion_cliente' },
   ] },
-  { id: 'clientes', label: 'Clientes', items: [
-    { to: '/customers',     label: 'Contactos',       icon: IconContacts,   minRole: 'atencion_cliente' },
-    { to: '/campaigns',     label: 'Difusiones',      icon: IconMegaphone,  minRole: 'atencion_cliente' },
-    { to: '/templates',     label: 'Plantillas',      icon: IconTemplate,   minRole: 'atencion_cliente' },
-  ] },
   { id: 'linea', label: 'La línea', items: [
+    { to: '/novedades',     label: 'Novedades',       icon: IconBell },
+    { to: '/flota',         label: 'Flota (internos)', icon: IconBus },
     { to: '/recorridos',    label: 'Recorridos',      icon: IconRoute },
     { to: '/tarifario',     label: 'Tarifario',       icon: IconDollar },
     { to: '/postulaciones', label: 'Postulaciones',   icon: IconFolder,     minRole: 'atencion_cliente' },
   ] },
   { id: 'config', label: 'Configuración', items: [
     { to: '/knowledge',     label: 'Knowledge Base',  icon: IconBook,       minRole: 'atencion_cliente' },
-    { to: '/areas',         label: 'Áreas',           icon: IconDepartment, minRole: 'atencion_cliente' },
-    { to: '/labels',        label: 'Etiquetas',       icon: IconTag,        minRole: 'atencion_cliente' },
-    { to: '/quick-replies', label: 'Resp. Rápidas',   icon: IconZap,        minRole: 'atencion_cliente' },
     { to: '/simulator',     label: 'Simulador',       icon: IconFlask,      minRole: 'atencion_cliente' },
     { to: '/config',        label: 'Configuración',   icon: IconSettings,   minRole: 'atencion_cliente' },
     { to: '/costs',         label: 'Costos',          icon: IconDollar,     minRole: 'admin' },
@@ -355,6 +353,17 @@ function IconBell({ className }) {
     <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
       <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+    </svg>
+  );
+}
+
+function IconBus({ className }) {
+  return (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="3" width="16" height="15" rx="2" />
+      <line x1="4" y1="11" x2="20" y2="11" />
+      <circle cx="8" cy="15" r="1" /><circle cx="16" cy="15" r="1" />
+      <path d="M6 18v2M18 18v2" />
     </svg>
   );
 }

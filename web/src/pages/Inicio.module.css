@@ -19,7 +19,7 @@
   position: absolute;
   right: 2%; top: -6%;
   font-family: var(--font-display);
-  font-weight: 800;
+  font-weight: 700;
   font-size: clamp(220px, 34vw, 520px);
   line-height: 1;
   letter-spacing: -0.04em;
@@ -143,7 +143,7 @@
   transition: transform 180ms var(--ease-out), box-shadow 180ms ease;
 }
 .acceso:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-.acceso strong { display: block; font-family: var(--font-display); font-size: 21px; font-weight: 800; text-transform: uppercase; line-height: 1.05; }
+.acceso strong { display: block; font-family: var(--font-display); font-size: 21px; font-weight: 700; text-transform: uppercase; line-height: 1.05; }
 .acceso small { display: block; color: var(--mute); font-size: 14px; }
 .accesoIcon { display: grid; place-items: center; flex: none; width: 46px; height: 46px; border-radius: 12px; background: var(--red-50); color: var(--red); }
 .accesoIcon svg { width: 24px; height: 24px; }
@@ -172,7 +172,7 @@
 .statsGrid > div:first-child { border-left: 0; padding-left: 0; }
 .statsGrid strong {
   display: block;
-  font-family: var(--font-display); font-weight: 800;
+  font-family: var(--font-display); font-weight: 700;
   font-size: clamp(44px, 5vw, 64px); line-height: 1;
 }
 .statsGrid strong small { font-size: .45em; margin-left: 4px; }
@@ -189,14 +189,14 @@
 .ramal { padding: 22px; display: flex; flex-direction: column; transition: transform 180ms var(--ease-out), box-shadow 180ms ease; }
 .ramal:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); }
 .ramalTop { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-.ramalTipo { padding: 5px 11px; border-radius: var(--r-full); font-size: 13px; font-weight: 700; }
+.ramalTipo { padding: 5px 11px; border-radius: var(--r-full); font-size: 13px; font-weight: 600; }
 .tipo_comun { background: var(--red-50); color: var(--red-600); }
 .tipo_habiles { background: var(--warn-50); color: var(--warn); }
 .tipo_expreso { background: var(--ink); color: #fff; }
 .ramalRuta {
   display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
   margin-top: 18px;
-  font-family: var(--font-display); font-size: 25px; font-weight: 800; text-transform: uppercase;
+  font-family: var(--font-display); font-size: 25px; font-weight: 700; text-transform: uppercase;
 }
 .ramalRuta svg { width: 20px; height: 20px; color: var(--red); }
 .ramalVia { margin-top: 8px; color: var(--mute); font-size: 15.5px; flex: 1; }
@@ -215,16 +215,16 @@
 .mapGrid { display: grid; grid-template-columns: 1fr 1.4fr; gap: clamp(28px, 4vw, 56px); align-items: start; }
 .h2 {
   margin-top: 12px;
-  font-family: var(--font-display); font-weight: 800; text-transform: uppercase;
+  font-family: var(--font-display); font-weight: 700; text-transform: uppercase;
   font-size: clamp(32px, 4.2vw, 50px); line-height: 1;
 }
 .h2Light { color: #fff; }
-.h3 { margin-top: 28px; font-size: 15px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+.h3 { margin-top: 28px; font-size: 15px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
 .barrios { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 .barrios li { padding: 6px 12px; border-radius: var(--r-full); background: #fff; border: 1px solid var(--line); font-size: 14.5px; font-weight: 600; }
 .lugares { display: grid; gap: 2px; margin-top: 10px; }
 .lugares li { display: flex; align-items: baseline; gap: 10px; padding: 9px 0; border-bottom: 1px dashed var(--line-2); font-weight: 600; }
-.lugares span { flex: none; width: 112px; font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--red); }
+.lugares span { flex: none; width: 112px; font-size: 12.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--red); }
 .mapPlaceholder { display: grid; place-items: center; height: 560px; border-radius: var(--r-lg); background: #e9eaec; color: var(--mute); }
 .mapNote { margin-top: 10px; font-size: 14px; color: var(--mute); }
 @media (max-width: 900px) { .mapGrid { grid-template-columns: 1fr; } }
@@ -245,7 +245,7 @@
   box-shadow: 0 30px 80px rgba(0, 0, 0, .45), 0 0 0 8px #262626;
 }
 .phoneHead { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--ink); color: #fff; border-bottom: 4px solid var(--red); }
-.phoneHead > span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--red); font-family: var(--font-display); font-weight: 800; }
+.phoneHead > span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; background: var(--red); font-family: var(--font-display); font-weight: 700; }
 .phoneHead small { display: block; font-size: 12.5px; color: #2fd27a; }
 .phoneBody { display: flex; flex-direction: column; gap: 10px; padding: 18px 14px 22px; background: var(--bg-soft); }
 .phoneBody p { max-width: 86%; padding: 10px 13px; border-radius: 15px; font-size: 14.5px; line-height: 1.42; }
@@ -265,30 +265,30 @@
 }
 .tarifaBand::after {
   content: '$'; position: absolute; right: -10px; bottom: -110px;
-  font-family: var(--font-display); font-weight: 800; font-size: 380px; line-height: 1;
+  font-family: var(--font-display); font-weight: 700; font-size: 380px; line-height: 1;
   color: rgba(255, 255, 255, .08); pointer-events: none;
 }
 .tarifaBand :global(.kicker) { color: #fff; }
-.tarifaPrecio { margin-top: 10px; font-family: var(--font-display); font-weight: 800; font-size: clamp(56px, 8vw, 96px); line-height: 1; }
-.tarifaPrecio small { display: block; font-size: 22px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; opacity: .85; }
+.tarifaPrecio { margin-top: 10px; font-family: var(--font-display); font-weight: 700; font-size: clamp(56px, 8vw, 96px); line-height: 1; }
+.tarifaPrecio small { display: block; font-size: 22px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; opacity: .85; }
 .tarifaText { margin: 12px 0 24px; max-width: 460px; color: #ffe1e2; font-size: 17px; }
 .tarifaNotes { position: relative; z-index: 1; display: grid; gap: 12px; }
 .tarifaNotes div { display: flex; align-items: center; gap: 16px; padding: 16px 18px; border-radius: var(--r-md); background: rgba(0, 0, 0, .16); }
-.tarifaNotes strong { flex: none; min-width: 112px; font-family: var(--font-display); font-size: 28px; font-weight: 800; text-transform: uppercase; }
+.tarifaNotes strong { flex: none; min-width: 112px; font-family: var(--font-display); font-size: 28px; font-weight: 700; text-transform: uppercase; }
 .tarifaNotes span { font-weight: 600; }
 @media (max-width: 860px) { .tarifaBand { grid-template-columns: 1fr; } }
 @media (max-width: 420px) { .tarifaNotes div { flex-direction: column; align-items: flex-start; gap: 2px; } }
 
 .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: clamp(40px, 6vw, 72px); }
 .features svg { width: 34px; height: 34px; color: var(--red); }
-.features h3 { margin-top: 14px; font-family: var(--font-display); font-weight: 800; font-size: 24px; text-transform: uppercase; }
+.features h3 { margin-top: 14px; font-family: var(--font-display); font-weight: 700; font-size: 24px; text-transform: uppercase; }
 .features p { margin-top: 6px; color: var(--mute); }
 @media (max-width: 760px) { .features { grid-template-columns: 1fr; } }
 
 /* ---------- CABECERAS ---------- */
 .cabeceras { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .cabecera { padding: 22px; border-top: 5px solid var(--red); }
-.cabecera h3 { font-family: var(--font-display); font-size: 26px; font-weight: 800; text-transform: uppercase; }
+.cabecera h3 { font-family: var(--font-display); font-size: 26px; font-weight: 700; text-transform: uppercase; }
 .cabecera p { margin-top: 8px; font-size: 15.5px; }
 .cabecera small { display: block; margin-top: 12px; color: var(--mute); font-size: 14px; }
 @media (max-width: 980px) { .cabeceras { grid-template-columns: 1fr 1fr; } }
@@ -303,13 +303,13 @@
   border: 1px solid var(--line);
 }
 .cta > svg { width: 38px; height: 38px; color: var(--red); }
-.cta h3 { margin-top: 18px; font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 3.4vw, 40px); text-transform: uppercase; line-height: 1; }
+.cta h3 { margin-top: 18px; font-family: var(--font-display); font-weight: 700; font-size: clamp(28px, 3.4vw, 40px); text-transform: uppercase; line-height: 1; }
 .cta p { margin-top: 10px; color: var(--mute); font-size: 17px; }
 .ctaActions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin-top: 24px; }
 .ctaRed { background: var(--ink); color: #fff; border-color: var(--ink); }
 .ctaRed > svg { color: #ff5a5f; }
 .ctaRed p { color: #c9c9cc; }
-.ctaLink { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: #fff; text-decoration: none; }
+.ctaLink { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: #fff; text-decoration: none; }
 .ctaLink svg { width: 18px; height: 18px; }
 .ctaLink:hover { text-decoration: underline; }
 @media (max-width: 760px) { .ctaGrid { grid-template-columns: 1fr; } }
@@ -362,3 +362,19 @@
 .lugares button:hover { color: var(--red); text-decoration-color: currentColor; }
 .lugares { grid-template-columns: 1fr 1fr; column-gap: 28px; }
 @media (max-width: 620px) { .lugares { grid-template-columns: 1fr; } }
+
+/* Reclamos (debajo del hero) */
+.reclamos { padding-block: clamp(48px, 6vw, 80px); background: var(--bg-soft); border-bottom: 1px solid var(--line); }
+.reclamosGrid { display: grid; grid-template-columns: 1fr 1.1fr; gap: clamp(28px, 5vw, 72px); align-items: start; }
+.reclamosLead { margin-top: 14px; color: var(--mute); font-size: 18px; max-width: 46ch; }
+.reclamosBtns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+.reclamos .h3 { margin: 0 0 14px; }
+@media (max-width: 900px) { .reclamosGrid { grid-template-columns: 1fr; } }
+
+/* Historia */
+.historia { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(28px, 5vw, 72px); align-items: center; }
+.historiaFoto { margin: 0; }
+.historiaFoto img { width: 100%; height: auto; border-radius: var(--r-xl); }
+.historiaFoto figcaption { margin-top: 10px; color: var(--mute); font-size: 14.5px; }
+.historiaText { margin-top: 16px; color: var(--ink-3); font-size: 18px; max-width: 52ch; }
+@media (max-width: 900px) { .historia { grid-template-columns: 1fr; } }

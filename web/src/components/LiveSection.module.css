@@ -14,12 +14,12 @@
   display: inline-flex; align-items: center; gap: 8px;
   padding: 8px 14px; border-radius: var(--r-md);
   background: var(--ink); color: #fff;
-  font-family: var(--font-display); font-weight: 800; font-size: 30px; line-height: 1;
+  font-family: var(--font-display); font-weight: 700; font-size: 30px; line-height: 1;
   font-variant-numeric: tabular-nums;
   box-shadow: var(--shadow-md);
 }
 .clock svg { width: 22px; height: 22px; color: #ff5a5f; }
-.day, .badge { padding: 6px 11px; border-radius: var(--r-full); background: #fff; font-weight: 700; font-size: 13.5px; box-shadow: var(--shadow-sm); }
+.day, .badge { padding: 6px 11px; border-radius: var(--r-full); background: #fff; font-weight: 600; font-size: 13.5px; box-shadow: var(--shadow-sm); }
 .badge { background: var(--red); color: #fff; animation: blink 1s ease-in-out infinite; }
 @keyframes blink { 50% { opacity: .65; } }
 
@@ -27,7 +27,7 @@
 .count { padding: 20px; border-radius: var(--r-lg); background: var(--ink); color: #fff; }
 .count > strong {
   display: block;
-  font-family: var(--font-display); font-weight: 800; font-size: 72px; line-height: .9;
+  font-family: var(--font-display); font-weight: 700; font-size: 72px; line-height: .9;
   font-variant-numeric: tabular-nums;
 }
 .count > span { font-weight: 600; color: #c9c9cc; }

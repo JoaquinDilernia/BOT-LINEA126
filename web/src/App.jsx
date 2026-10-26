@@ -25,6 +25,8 @@ export default function App() {
             <Route path="recorridos" element={<Recorridos />} />
             <Route path="horarios" element={<Horarios />} />
             <Route path="tarifas" element={<Tarifas />} />
+            <Route path="reclamos" element={<Atencion />} />
+            {/* Ruta vieja: los links ya compartidos siguen funcionando. */}
             <Route path="atencion" element={<Atencion />} />
             <Route path="empresa" element={<Empresa />} />
             <Route path="trabaja" element={<Trabaja />} />

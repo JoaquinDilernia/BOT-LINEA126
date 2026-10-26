@@ -23,6 +23,9 @@ import Tarifario     from './pages/Tarifario.jsx';
 import Postulaciones from './pages/Postulaciones.jsx';
 import Customers     from './pages/Customers.jsx';
 import Campaigns     from './pages/Campaigns.jsx';
+import Gestion       from './pages/Gestion.jsx';
+import Novedades     from './pages/Novedades.jsx';
+import Flota         from './pages/Flota.jsx';
 
 export default function App() {
   return (
@@ -63,6 +66,9 @@ function AppRoutes() {
           <Route path="areas"         element={<Areas />} />
           <Route path="users"         element={<Users />} />
           <Route path="reclamos"      element={<Reclamos />} />
+          <Route path="gestion"       element={<Gestion />} />
+          <Route path="novedades"     element={<Novedades />} />
+          <Route path="flota"         element={<Flota />} />
           <Route path="recorridos"    element={<Recorridos />} />
           <Route path="tarifario"     element={<Tarifario />} />
           <Route path="postulaciones" element={<Postulaciones />} />

@@ -5,6 +5,7 @@ import { getAllRecorridos } from '../services/recorrido.service.js';
 import { getAllTarifas } from '../services/tarifa.service.js';
 import { getPublicReclamoByNumero } from '../services/ticket.service.js';
 import { createPostulacion } from '../services/postulacion.service.js';
+import { getNovedadesVigentes, toPublic } from '../services/novedad.service.js';
 
 // Todo lo que consume el sitio institucional. Sin auth: sólo devuelve datos
 // públicos (nunca contactos, legajos ni notas internas).
@@ -102,6 +103,18 @@ router.get('/tarifas', async (req, res) => {
     res.json({ tarifas });
   } catch (err) {
     res.status(500).json({ error: 'No pudimos cargar las tarifas.' });
+  }
+});
+
+// --- Novedades (banner del sitio: desvíos, cortes, paros) -------------------
+router.get('/novedades', async (req, res) => {
+  try {
+    const novedades = (await getNovedadesVigentes()).map(toPublic)
+      .sort((a, b) => Number(b.destacado) - Number(a.destacado));
+    res.set('Cache-Control', 'public, max-age=60');
+    res.json({ novedades });
+  } catch (err) {
+    res.status(500).json({ error: 'No pudimos cargar las novedades.' });
   }
 });
 

@@ -36,3 +36,16 @@ test('buildSystemPrompt: nunca ofrece derivar a una persona', () => {
   assert.match(out, /NO HAY DERIVACIÓN A HUMANOS/);
   assert.doesNotMatch(out, /\[ESCALAR/);
 });
+
+test('buildSystemPrompt: el interno es obligatorio y se valida contra la flota', () => {
+  const out = promptText({}, '', null, [], '', '', { reclamos: { internos: '1-120, 130' } });
+  assert.match(out, /NÚMERO DE INTERNO — OBLIGATORIO/);
+  assert.match(out, /VÁLIDOS de la flota: 1-120, 130/);
+  assert.match(out, /"interno":"36","ramal":"A"/);
+});
+
+test('buildSystemPrompt: las novedades van fuera del bloque cacheado', () => {
+  const blocks = buildSystemPrompt({}, 'KB', null, [], '', '', { novedades: '- [Paro] Paro de UTA el jueves' });
+  assert.doesNotMatch(blocks[0].text, /Paro de UTA/);
+  assert.match(blocks[1].text, /NOVEDADES VIGENTES[\s\S]*Paro de UTA/);
+});

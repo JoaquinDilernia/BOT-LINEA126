@@ -10,8 +10,6 @@ export const EMPRESA = {
   direccion: 'Av. Diego A. Maradona 4920 (ex Mons. Bufano), La Tablada, La Matanza',
   direccionCorta: 'Av. D. A. Maradona 4920, La Tablada',
   coords: [-34.69627, -58.5462],
-  telefono0800: '0800-444-0273',
-  telefono0800Href: 'tel:08004440273',
   telefono: '(011) 4482-1639',
   telefonoHref: 'tel:+541144821639',
   horarioOficina: 'Lunes a viernes de 9 a 16 h',
@@ -178,6 +176,23 @@ export const CATEGORIAS_RECLAMO = [
   { id: 'manejo_peligroso', label: 'Manejo peligroso', icon: 'alert' },
   { id: 'unidad_mal_estado', label: 'Unidad en mal estado', icon: 'bus' },
   { id: 'cobro_indebido', label: 'Cobro indebido', icon: 'card' },
+  { id: 'accidente', label: 'Accidente o seguridad', icon: 'shield' },
   { id: 'objeto_perdido', label: 'Objeto perdido', icon: 'bag' },
   { id: 'otro', label: 'Sugerencia u otro', icon: 'chat' },
+];
+
+// Fotos reales de la flota (las pasó la línea, oct/2026). Viven en
+// public/fotos y se sirven con rutas relativas (el sitio usa HashRouter).
+export const FOTOS = {
+  clasico: { src: 'fotos/clasico-126.jpg', w: 750, h: 562, alt: 'Colectivo clásico Mercedes-Benz de la 126, rojo con fileteado, restaurado como unidad de auxilio', pie: 'El clásico de la casa: restaurado en nuestro taller, hoy sale como unidad de auxilio.' },
+  unidad: { src: 'fotos/unidad-31.jpg', w: 1080, h: 1080, alt: 'Interno 31 de la Línea 126 en la terminal, rojo y blanco con detalles fileteados', pie: 'Interno 31 en la terminal de La Tablada, con el fileteado de la línea.' },
+  frente: { src: 'fotos/frente-126.jpg', w: 447, h: 447, alt: 'Frente de un colectivo de la 126 con el cartel Plaza de Mayo, Retiro y Villegas', pie: 'Listo para salir: Plaza de Mayo, Retiro y Villegas.' },
+};
+
+// Texto institucional. Tono de relato, sin fechas ni cifras históricas que
+// no estén confirmadas por la empresa.
+export const HISTORIA = [
+  'La 126 es parte del paisaje del oeste desde hace décadas. Generaciones de vecinos de La Tablada, Villegas, Mataderos y Flores fueron al trabajo, a la escuela, al hospital y a la cancha arriba de nuestros colectivos rojos.',
+  'Somos una empresa de La Matanza que creció con su gente. Muchos de nuestros choferes, mecánicos e inspectores son del barrio, y en la terminal de La Tablada se conocen por el nombre: ahí arranca y termina cada vuelta.',
+  'Y hay cosas que no cambiamos: el fileteado porteño en nuestras unidades, el cuidado de cada coche en taller propio y el clásico 126, restaurado pieza por pieza, que todavía sale a la calle.',
 ];

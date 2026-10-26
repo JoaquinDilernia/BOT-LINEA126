@@ -4,6 +4,7 @@ import BusArt from '../components/BusArt.jsx';
 import RamalBadge from '../components/RamalBadge.jsx';
 import LiveSection from '../components/LiveSection.jsx';
 import RouteDraw from '../components/RouteDraw.jsx';
+import Seguimiento from '../components/Seguimiento.jsx';
 import {
   IconArrow, IconBag, IconCard, IconChat, IconClock, IconRoute, IconSearch, IconShield, IconMoon, IconAccessible, IconSwap, IconBriefcase, IconPin,
 } from '../components/icons.jsx';
@@ -12,14 +13,14 @@ import { useChat } from '../lib/chat.jsx';
 import { useCountUp, useTypewriter } from '../lib/motion.js';
 import { useSimClock } from '../lib/useSim.js';
 import { busesEn, esNoche } from '../lib/sim.js';
-import { BARRIOS, CABECERAS, LUGARES, RAMALES, TIPO_RAMAL, peso } from '../data/linea.js';
+import { BARRIOS, CABECERAS, FOTOS, HISTORIA, LUGARES, RAMALES, TIPO_RAMAL, peso } from '../data/linea.js';
 import s from './Inicio.module.css';
 
 const ACCESOS = [
   { to: '/como-llego', icon: IconPin, title: 'Cómo llego', text: 'Parada, precio y tiempo' },
   { to: '/recorridos', icon: IconRoute, title: 'Recorridos', text: 'Mapa, paradas y ramales' },
   { to: '/tarifas', icon: IconCard, title: 'Tarifas', text: 'Calculá tu boleto' },
-  { to: '/atencion', icon: IconShield, title: 'Reclamos', text: 'Hacé y seguí tu reclamo' },
+  { to: '/reclamos', icon: IconShield, title: 'Reclamos', text: 'Hacé y seguí tu reclamo' },
 ];
 
 const EJEMPLOS = ['Hospital Santa Lucía', 'Plaza de Mayo', 'Feria de Mataderos', 'Mercado de San Telmo', 'Parque Chacabuco', 'Estación Retiro'];
@@ -112,6 +113,25 @@ export default function Inicio() {
         </div>
       </section>
 
+      {/* RECLAMOS — arriba de todo, pedido de la línea */}
+      <section className={s.reclamos} id="reclamos">
+        <div className={`container ${s.reclamosGrid}`}>
+          <div className="reveal">
+            <span className="kicker">Reclamos</span>
+            <h2 className={s.h2}>¿Tuviste un problema en un viaje?</h2>
+            <p className={s.reclamosLead}>Hacé tu reclamo por el chat en minutos y seguilo con tu número. Tené a mano el número de interno del colectivo.</p>
+            <div className={s.reclamosBtns}>
+              <button type="button" className="btn" onClick={() => openChat('Quiero hacer un reclamo')}><IconShield /> Hacer un reclamo</button>
+              <Link to="/reclamos#perdidos" className="btn btn--ghost"><IconBag /> Objetos perdidos</Link>
+            </div>
+          </div>
+          <div className="reveal">
+            <h3 className={s.h3}>Consultá el estado de tu reclamo</h3>
+            <Seguimiento idPrefix="home" />
+          </div>
+        </div>
+      </section>
+
       {/* DATOS */}
       <section className={s.stats}>
         <div className={`container ${s.statsGrid}`}>
@@ -124,6 +144,23 @@ export default function Inicio() {
 
       {/* EN VIVO */}
       <LiveSection />
+
+      {/* HISTORIA */}
+      <section className="section">
+        <div className={`container ${s.historia}`}>
+          <figure className={`reveal ${s.historiaFoto}`}>
+            <img src={FOTOS.clasico.src} width={FOTOS.clasico.w} height={FOTOS.clasico.h} alt={FOTOS.clasico.alt} loading="lazy" />
+            <figcaption>{FOTOS.clasico.pie}</figcaption>
+          </figure>
+          <div className="reveal">
+            <span className="kicker">Nuestra historia</span>
+            <h2 className={s.h2}>Hecha en La Tablada</h2>
+            <p className={s.historiaText}>{HISTORIA[0]}</p>
+            <p className={s.historiaText}>{HISTORIA[2]}</p>
+            <Link to="/empresa" className={`btn btn--dark ${s.planBtn}`}>Conocé la empresa <IconArrow /></Link>
+          </div>
+        </div>
+      </section>
 
       {/* RAMALES */}
       <section className="section">
@@ -187,8 +224,8 @@ export default function Inicio() {
         <div className={`container ${s.botGrid}`}>
           <div className="reveal">
             <span className="kicker">Atención al pasajero 24 h</span>
-            <h2 className={`${s.h2} ${s.h2Light}`}>Preguntale al asistente de la 126</h2>
-            <p className={s.botLead}>Contestá tus dudas en segundos, sin esperas ni llamadas. Conoce todos los recorridos, paradas y tarifas, y si tuviste un problema registra tu reclamo con número de seguimiento.</p>
+            <h2 className={`${s.h2} ${s.h2Light}`}>Chateá con nosotros</h2>
+            <p className={s.botLead}>Resolvé tus dudas en segundos, sin esperas ni llamadas. El chat conoce todos los recorridos, paradas, tarifas y novedades del servicio, y si tuviste un problema registra tu reclamo con número de seguimiento.</p>
             <ul className={s.botList}>
               <li><IconRoute /> ¿Me deja cerca? ¿Dónde lo tomo?</li>
               <li><IconCard /> ¿Cuánto sale mi boleto?</li>
@@ -253,18 +290,9 @@ export default function Inicio() {
         </div>
       </section>
 
-      {/* ATENCIÓN + EMPLEO */}
+      {/* EMPLEO */}
       <section className="section">
-        <div className={`container ${s.ctaGrid}`}>
-          <article className={`reveal ${s.cta} ${s.ctaRed}`}>
-            <IconShield />
-            <h3>¿Tuviste un problema en un viaje?</h3>
-            <p>Hacé tu reclamo en minutos y seguilo con tu número.</p>
-            <div className={s.ctaActions}>
-              <button type="button" className="btn btn--light" onClick={() => openChat('Quiero hacer un reclamo')}>Hacer un reclamo</button>
-              <Link to="/atencion#seguimiento" className={s.ctaLink}>Seguí tu reclamo <IconArrow /></Link>
-            </div>
-          </article>
+        <div className="container">
           <article className={`reveal ${s.cta}`}>
             <IconBriefcase />
             <h3>Sumate a la 126</h3>

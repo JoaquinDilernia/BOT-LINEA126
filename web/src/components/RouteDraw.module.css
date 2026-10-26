@@ -12,14 +12,14 @@
 .inner { position: relative; display: grid; grid-template-columns: 360px 1fr; gap: 32px; align-items: center; width: 100%; }
 
 .text :global(.kicker) { color: #ff5a5f; }
-.title { margin-top: 12px; font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(30px, 3.6vw, 46px); line-height: 1; }
+.title { margin-top: 12px; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; font-size: clamp(30px, 3.6vw, 46px); line-height: 1; }
 .meter { display: flex; align-items: baseline; gap: 8px; margin-top: 26px; }
-.meter strong { font-family: var(--font-display); font-weight: 800; font-size: clamp(72px, 9vw, 120px); line-height: .85; font-variant-numeric: tabular-nums; color: #fff; }
-.meter span { font-family: var(--font-display); font-weight: 800; font-size: 30px; color: var(--red); text-transform: uppercase; }
+.meter strong { font-family: var(--font-display); font-weight: 700; font-size: clamp(72px, 9vw, 120px); line-height: .85; font-variant-numeric: tabular-nums; color: #fff; }
+.meter span { font-family: var(--font-display); font-weight: 700; font-size: 30px; color: var(--red); text-transform: uppercase; }
 .now { display: flex; flex-direction: column; margin-top: 18px; min-height: 92px; }
-.now span { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #8f8f94; }
+.now span { font-size: 13px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: #8f8f94; }
 .now b {
-  font-family: var(--font-display); font-weight: 800; font-size: 40px; text-transform: uppercase; line-height: 1.05;
+  font-family: var(--font-display); font-weight: 700; font-size: 40px; text-transform: uppercase; line-height: 1.05;
   animation: swapIn .4s var(--ease-out);
 }
 .now small { color: #b9b9bd; font-size: 15px; }
@@ -36,7 +36,7 @@
 }
 .hito circle { fill: #1c1c1e; stroke: #3a3a3d; stroke-width: 3; transition: fill .3s ease, stroke .3s ease, r .3s ease; }
 .hito text {
-  fill: #6b6b70; font-family: var(--font-display); font-weight: 700; font-size: 22px; text-transform: uppercase; letter-spacing: .02em;
+  fill: #6b6b70; font-family: var(--font-display); font-weight: 600; font-size: 22px; text-transform: uppercase; letter-spacing: .02em;
   transition: fill .3s ease, opacity .3s ease;
   paint-order: stroke; stroke: var(--ink); stroke-width: 6px; stroke-linejoin: round;
 }

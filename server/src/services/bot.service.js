@@ -15,7 +15,9 @@ import { getOrCreateCustomer, buildCustomerContext } from './customer.service.js
 import { getAllLabels, createLabel } from './label.service.js';
 import { getTarifarioPrompt } from './tarifa.service.js';
 import { getRecorridosPrompt } from './recorrido.service.js';
-import { createTicket } from './ticket.service.js';
+import { createTicket, getReclamosConfig, DEFAULT_RECLAMOS_CONFIG } from './ticket.service.js';
+import { getInternosSet, compactInternos, validarInternoReclamo } from './unidad.service.js';
+import { getNovedadesPrompt } from './novedad.service.js';
 import { getDb } from './firebase.service.js';
 import { toWaContactId } from './phone.js';
 
@@ -116,9 +118,9 @@ async function processIncomingMessageInternal(msg) {
     ...(msg.mimeType && { mimeType: msg.mimeType }),
   };
 
-  let conversation, history, knowledgeBase, customer, availableLabels, configDoc, tarifario, recorridos;
+  let conversation, history, knowledgeBase, customer, availableLabels, configDoc, tarifario, recorridos, reclamosConfig, internos, novedades;
   try {
-    [conversation, history, knowledgeBase, customer, availableLabels, configDoc, tarifario, recorridos] = await Promise.all([
+    [conversation, history, knowledgeBase, customer, availableLabels, configDoc, tarifario, recorridos, reclamosConfig, internos, novedades] = await Promise.all([
       getOrCreateConversation(from, channel, contactName),
       getConversationHistory(from),
       getKnowledgeBasePrompt().catch(() => ''),
@@ -127,6 +129,9 @@ async function processIncomingMessageInternal(msg) {
       getDb().collection('bot-linea126_config').doc('bot_config').get().catch(() => ({ exists: false, data: () => ({}) })),
       getTarifarioPrompt().catch(() => ''),
       getRecorridosPrompt().catch(() => ''),
+      getReclamosConfig().catch(() => DEFAULT_RECLAMOS_CONFIG),
+      getInternosSet().catch(() => new Set()),
+      getNovedadesPrompt().catch(() => ''),
     ]);
   } catch (err) {
     console.error('[bot] Error cargando contexto para', from, err.message);
@@ -261,6 +266,8 @@ async function processIncomingMessageInternal(msg) {
       imageData,
       tarifario,
       recorridos,
+      reclamos: { internos: compactInternos(internos), categoriasSinInterno: reclamosConfig.categoriasSinInterno },
+      novedades,
     });
   } catch (err) {
     console.error(`[bot] Claude falló definitivamente para ${from} tras reintentos:`, err.message);
@@ -311,6 +318,28 @@ async function processIncomingMessageInternal(msg) {
     }
   }
 
+  // Red de seguridad del interno obligatorio: si Claude igual mandó el
+  // marcador sin un interno válido, no se crea el reclamo y se le pide al
+  // pasajero que lo revise.
+  let internoReclamo = '';
+  if (shouldCreateReclamo && reclamoParams) {
+    const check = validarInternoReclamo(
+      { interno: reclamoParams.interno, categoria: reclamoParams.categoria },
+      { internos, categoriasSinInterno: reclamosConfig.categoriasSinInterno },
+    );
+    if (!check.ok) {
+      const pedido = check.motivo === 'invalido'
+        ? `El interno *${check.interno}* no figura en la flota de la 126, así que todavía no pude registrar el reclamo. ¿Lo podés revisar? Es el número pintado en el frente, los costados y atrás del colectivo, y adentro cerca del chofer.`
+        : 'Para registrar el reclamo necesito el *número de interno* del colectivo: está pintado en el frente, los costados y atrás de la unidad, y adentro cerca del chofer. ¿Lo tenés?';
+      console.log(`[bot] Reclamo NO creado para ${from}: interno ${check.motivo} (${reclamoParams.interno ?? '—'})`);
+      await appendMessage(from, { role: 'assistant', content: pedido });
+      if (channel === 'whatsapp') await sendWhatsAppMessage(from, pedido).catch(() => {});
+      else if (channel === 'instagram') await sendInstagramMessage(from, pedido).catch(() => {});
+      return;
+    }
+    internoReclamo = check.interno;
+  }
+
   if (shouldCreateReclamo && reclamoParams) {
     try {
       // Si el mensaje que disparó el reclamo era una imagen, se adjunta esa.
@@ -331,12 +360,18 @@ async function processIncomingMessageInternal(msg) {
         prioridad: ['baja', 'media', 'alta', 'urgente'].includes(reclamoParams.prioridad) ? reclamoParams.prioridad : 'media',
         categoria: reclamoParams.categoria || 'otro',
         imagenes: imageMediaId ? [{ mediaId: imageMediaId, mimeType: 'image/jpeg' }] : [],
+        numeroUnidad: internoReclamo,
+        ramal: /^[A-F]$/i.test(String(reclamoParams.ramal ?? '').trim()) ? String(reclamoParams.ramal).trim() : '',
         createdBy: 'bot',
       });
-      console.log(`[bot] Reclamo ${reclamo.numero} creado para ${from}`);
+      console.log(`[bot] Reclamo ${reclamo.numero} (${reclamo.gravedad}) creado para ${from}`);
 
-      const webHint = channel === 'web' ? ' También podés ver cómo avanza en la sección *Seguí tu reclamo* del sitio.' : '';
-      const confirmMsg = `✅ Reclamo *N° ${reclamo.numero}* registrado. Quedó guardado en nuestro sistema y en breve te vamos a contestar por acá con la resolución. Guardá este número por las dudas.${webHint}`;
+      // Común: ya nace respondido con la respuesta automática. Grave: queda
+      // en la bandeja del panel y lo responde una persona.
+      const webHint = channel === 'web' ? ' Podés consultarlo cuando quieras en *Seguí tu reclamo*, en el sitio.' : '';
+      const confirmMsg = reclamo.gravedad === 'grave'
+        ? `✅ Reclamo *N° ${reclamo.numero}* registrado. Por la gravedad de lo que contás lo revisa personalmente el equipo de la línea y te vamos a responder por acá. Guardá este número.${webHint}`
+        : `✅ Reclamo *N° ${reclamo.numero}* registrado.\n\n${reclamo.respuestas?.[0]?.texto ?? ''}\n\nGuardá este número por las dudas.${webHint}`;
       await appendMessage(from, { role: 'assistant', content: confirmMsg });
       if (channel === 'whatsapp') await sendWhatsAppMessage(from, confirmMsg).catch(() => {});
       else if (channel === 'instagram') await sendInstagramMessage(from, confirmMsg).catch(() => {});
