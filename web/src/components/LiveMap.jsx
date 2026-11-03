@@ -6,10 +6,10 @@ import { busesEn } from '../lib/sim.js';
 import s from './LiveMap.module.css';
 
 const TERMINALES = [
-  { nombre: 'Retiro', latlng: trazado.ida[0] },
-  { nombre: 'La Tablada', latlng: trazado.vuelta[0] },
+  { nombre: 'Retiro', latlng: trazado.haciaTablada[0] },
+  { nombre: 'La Tablada', latlng: trazado.haciaRetiro[0] },
 ];
-const BOUNDS = [...trazado.ida, ...trazado.vuelta];
+const BOUNDS = [...trazado.haciaTablada, ...trazado.haciaRetiro];
 
 function busIcon(sentido) {
   return L.divIcon({
@@ -66,7 +66,7 @@ function Fit() {
 }
 
 export default function LiveMap({ clock, fast = false, height = 560 }) {
-  const lineas = useMemo(() => [trazado.ida, trazado.vuelta], []);
+  const lineas = useMemo(() => [trazado.haciaTablada, trazado.haciaRetiro], []);
   return (
     <div className={s.wrap} style={{ height }}>
       <MapContainer center={[-34.64, -58.46]} zoom={12} scrollWheelZoom={false} className={s.map} zoomControl>

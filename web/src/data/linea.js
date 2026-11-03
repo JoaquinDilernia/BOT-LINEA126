@@ -26,9 +26,9 @@ export const RAMALES = [
   },
   {
     letra: 'B', tipo: 'comun', desde: 'Retiro', hasta: 'Cementerio de Villegas',
-    detalle: 'Peribebuy y Mocoretá',
+    detalle: 'Pedro León Gallo y Peribebuy',
     horario: 'Todos los días',
-    via: 'Igual que el A hasta Av. Crovara; sigue por Ambrosetti y Peribebuy.',
+    via: 'Igual que el A hasta Av. Crovara; sigue por Centenera, José C. Paz y Ambrosetti.',
   },
   {
     letra: 'C', tipo: 'habiles', desde: 'Directorio y J. M. Moreno', hasta: 'La Tablada',
@@ -40,7 +40,7 @@ export const RAMALES = [
     letra: 'D', tipo: 'habiles', desde: 'Directorio y J. M. Moreno', hasta: 'Cementerio de Villegas',
     detalle: 'Caballito ⇄ Villegas',
     horario: 'Días hábiles de 7:00 a 10:30',
-    via: 'Mismo trazado que el C, con final en Peribebuy y Mocoretá.',
+    via: 'Mismo trazado que el C, con final en el Cementerio de Villegas.',
   },
   {
     letra: 'E', tipo: 'expreso', desde: 'Retiro', hasta: 'La Tablada',
@@ -66,7 +66,7 @@ export const CABECERAS = [
   { nombre: 'Retiro', detalle: 'Av. de los Inmigrantes entre Cabo P. T. Fels y Av. Antártida Argentina', combina: 'Trenes Mitre, San Martín y Belgrano Norte · Subte C · Terminal de ómnibus', coords: [-34.58626, -58.37049] },
   { nombre: 'Caballito', detalle: 'Av. Directorio y Av. José María Moreno (ramales C y D)', combina: 'Parque Chacabuco', coords: [-34.62815, -58.43478] },
   { nombre: 'La Tablada', detalle: 'Av. D. A. Maradona 4920 · terminal y sede de la empresa', combina: 'Atención al pasajero y objetos perdidos', coords: [-34.69627, -58.5462] },
-  { nombre: 'Cementerio de Villegas', detalle: 'Peribebuy y Mocoretá, San Justo', combina: 'Ramales B, D y F', coords: [-34.7016, -58.5628] },
+  { nombre: 'Cementerio de Villegas', detalle: 'Pedro León Gallo y Peribebuy, Villegas', combina: 'Ramales B, D y F · estación Justo Villegas', coords: [-34.70136, -58.5639] },
 ];
 
 // Diagramación Invierno 2026 del ramal A (intervalos programados).
@@ -110,19 +110,20 @@ export const FRECUENCIAS = {
   },
 };
 
-// Seccionados oficiales (Invierno 2026) con tiempos de marcha pico/valle del
-// tramo que empieza en ese punto, de La Tablada hacia Retiro.
+// Seccionados del listado oficial de paradas de la empresa (nov/2026), de
+// La Tablada hacia Retiro, con km y tiempos de marcha pico/valle del tramo que
+// empieza en ese punto (diagramación Invierno 2026).
 export const SECCIONADOS = [
-  { nombre: 'Av. D. A. Maradona y 9 de Julio', barrio: 'La Tablada', km: 0, pico: 9, valle: 8 },
-  { nombre: 'Av. Crovara y Roque Simone', barrio: 'La Tablada', etiqueta: 'Av. Crovara', km: 2.663, pico: 10, valle: 8 },
-  { nombre: 'Av. Crovara y Av. Gral. Paz', barrio: 'Límite CABA', etiqueta: 'Gral. Paz', km: 5.351, pico: 11, valle: 9 },
-  { nombre: 'Av. Directorio y Larrazábal', barrio: 'Mataderos', km: 8.23, pico: 12, valle: 9 },
-  { nombre: 'Av. Directorio y Azul', barrio: 'Floresta', km: 11.249, pico: 14, valle: 11 },
-  { nombre: 'Av. Directorio y Av. J. M. Moreno', barrio: 'Caballito', km: 15.043, pico: 11, valle: 9 },
-  { nombre: 'Av. San Juan y La Rioja', barrio: 'San Cristóbal', km: 17.527, pico: 12, valle: 11 },
-  { nombre: 'Av. San Juan y Perú', barrio: 'San Telmo', km: 20.561, pico: 13, valle: 10 },
-  { nombre: 'Av. L. N. Alem y Av. Corrientes', barrio: 'Microcentro', km: 24.79, pico: 8, valle: 7 },
-  { nombre: 'Av. de los Inmigrantes y Cabo P. T. Fels', barrio: 'Retiro', km: 27.002 },
+  { nombre: 'Terminal La Tablada (Av. D. A. Maradona 4920)', barrio: 'La Tablada', etiqueta: 'La Tablada', km: 0, pico: 9, valle: 8 },
+  { nombre: 'Formosa (Av. Crovara 2840)', barrio: 'La Tablada', etiqueta: 'Formosa', km: 2.663, pico: 10, valle: 8 },
+  { nombre: 'General Paz (Av. Eva Perón 7424)', barrio: 'Mataderos', etiqueta: 'Gral. Paz', km: 5.351, pico: 11, valle: 9 },
+  { nombre: 'Pieres / Larrazábal (Av. Directorio)', barrio: 'Mataderos', etiqueta: 'Mataderos', km: 8.23, pico: 12, valle: 9 },
+  { nombre: 'Varela (Directorio) / Pergamino (Alberdi)', barrio: 'Flores', etiqueta: 'Flores', km: 11.249, pico: 14, valle: 11 },
+  { nombre: 'Centenera (Directorio / Pedro Goyena)', barrio: 'Parque Chacabuco', etiqueta: 'Parque Chacabuco', km: 15.043, pico: 11, valle: 9 },
+  { nombre: 'La Rioja (Av. San Juan / Humberto 1º)', barrio: 'San Cristóbal', km: 17.527, pico: 12, valle: 11 },
+  { nombre: 'Tacuarí (Av. San Juan / Lima)', barrio: 'Constitución', km: 20.561, pico: 13, valle: 10 },
+  { nombre: 'Diagonal Sur (Av. Julio A. Roca)', barrio: 'Monserrat', km: 24.79, pico: 8, valle: 7 },
+  { nombre: 'Retiro (Av. de los Inmigrantes)', barrio: 'Retiro', km: 27.002 },
 ];
 
 // Tarifa general por cantidad de seccionados entre subida y bajada (matriz
@@ -139,30 +140,35 @@ export function tarifaEntre(i, j) {
 export const peso = (n) =>
   `$${Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
+// Lugares a los que acerca, del listado oficial de paradas (columna "Cercanía").
 export const LUGARES = [
-  { nombre: 'Estación Retiro', tipo: 'Transporte', barrio: 'Retiro' },
-  { nombre: 'Torre Monumental y Plaza San Martín', tipo: 'Paseo', barrio: 'Retiro' },
-  { nombre: 'Palacio Libertad (ex CCK)', tipo: 'Cultura', barrio: 'San Nicolás' },
-  { nombre: 'Luna Park', tipo: 'Espectáculos', barrio: 'San Nicolás' },
-  { nombre: 'Plaza de Mayo, Casa Rosada y Cabildo', tipo: 'Historia', barrio: 'Monserrat' },
-  { nombre: 'Mercado de San Telmo', tipo: 'Paseo', barrio: 'San Telmo' },
-  { nombre: 'Hospital de Quemados', tipo: 'Salud', barrio: 'Caballito' },
-  { nombre: 'Hospital César Milstein', tipo: 'Salud', barrio: 'Balvanera' },
+  { nombre: 'Estación Retiro y terminal de ómnibus', tipo: 'Transporte', barrio: 'Retiro' },
+  { nombre: 'Palacio Libertad y Luna Park', tipo: 'Cultura', barrio: 'San Nicolás' },
+  { nombre: 'Plaza de Mayo y Cabildo', tipo: 'Historia', barrio: 'Monserrat' },
+  { nombre: 'Manzana de las Luces', tipo: 'Historia', barrio: 'Monserrat' },
+  { nombre: 'Feria de San Telmo', tipo: 'Paseo', barrio: 'San Telmo' },
+  { nombre: 'Facultad de Ingeniería (UBA) y UCA', tipo: 'Educación', barrio: 'Monserrat' },
+  { nombre: 'UADE', tipo: 'Educación', barrio: 'Monserrat' },
+  { nombre: 'Facultad de Ciencias Sociales (UBA)', tipo: 'Educación', barrio: 'Constitución' },
   { nombre: 'Hospital Santa Lucía', tipo: 'Salud', barrio: 'San Cristóbal' },
-  { nombre: 'Facultad de Filosofía y Letras (UBA)', tipo: 'Educación', barrio: 'Caballito' },
+  { nombre: 'Hospital Milstein', tipo: 'Salud', barrio: 'San Cristóbal' },
+  { nombre: 'Hospital del Quemado', tipo: 'Salud', barrio: 'Caballito' },
+  { nombre: 'Facultad de Filosofía y Letras (UBA)', tipo: 'Educación', barrio: 'Parque Chacabuco' },
   { nombre: 'Parque Chacabuco', tipo: 'Parque', barrio: 'Parque Chacabuco' },
+  { nombre: 'UFLO', tipo: 'Educación', barrio: 'Flores' },
   { nombre: 'Parque Avellaneda', tipo: 'Parque', barrio: 'Parque Avellaneda' },
-  { nombre: 'Estadio de Nueva Chicago', tipo: 'Deporte', barrio: 'Mataderos' },
   { nombre: 'Feria de Mataderos', tipo: 'Paseo', barrio: 'Mataderos' },
-  { nombre: 'Policlínico Actis', tipo: 'Salud', barrio: 'La Tablada' },
+  { nombre: 'Estadio de Nueva Chicago', tipo: 'Deporte', barrio: 'Mataderos' },
+  { nombre: 'Estación La Tablada', tipo: 'Transporte', barrio: 'La Tablada' },
+  { nombre: 'Estación Justo Villegas', tipo: 'Transporte', barrio: 'Villegas' },
 ];
 
-export const BARRIOS = ['Retiro', 'San Nicolás', 'Monserrat', 'San Telmo', 'Constitución', 'San Cristóbal', 'Boedo', 'Caballito', 'Parque Chacabuco', 'Flores', 'Floresta', 'Vélez Sarsfield', 'Parque Avellaneda', 'Mataderos', 'Villa Insuperable', 'Las Antenas', 'La Tablada', 'San Justo'];
+export const BARRIOS = ['Retiro', 'San Nicolás', 'Monserrat', 'San Telmo', 'Constitución', 'San Cristóbal', 'Boedo', 'Caballito', 'Parque Chacabuco', 'Flores', 'Parque Avellaneda', 'Mataderos', 'Villa Madero', 'La Tablada', 'Villegas'];
 
 export const FAQ = [
   { q: '¿Cómo pago el boleto?', a: 'Sólo con tarjeta SUBE. Al subir decile al chofer hasta dónde viajás y apoyá la tarjeta. Registrala a tu nombre: sin registrar el boleto sale el doble.' },
   { q: '¿El colectivo funciona de noche?', a: 'Sí. En días hábiles el ramal A tiene servicio nocturno desde las 00:45, con frecuencias de 20 a 60 minutos de madrugada. Sábados arranca a las 4 y domingos a las 6.' },
-  { q: '¿Qué ramal me deja más cerca?', a: 'El A termina en La Tablada (Av. D. A. Maradona 4920) y el B en el Cementerio de Villegas (Peribebuy y Mocoretá). En días hábiles a la mañana, el C y el D salen desde Caballito. Preguntale al asistente desde dónde y hasta dónde viajás.' },
+  { q: '¿Qué ramal me deja más cerca?', a: 'El A termina en La Tablada (Av. D. A. Maradona 4920) y el B en el Cementerio de Villegas (Pedro León Gallo y Peribebuy). En días hábiles a la mañana, el C y el D salen desde Caballito. Preguntale al asistente desde dónde y hasta dónde viajás.' },
   { q: '¿Los expresos paran en todas las paradas?', a: 'No en el tramo por autopista. Hacia provincia no se puede subir ni bajar entre Carlos Calvo (subida a la AU 25 de Mayo) y Pitágoras y Av. Alberdi; hacia Retiro, entre Av. Directorio y Dámaso Larrañaga y Bernardo de Irigoyen y Av. San Juan.' },
   { q: '¿Perdí algo en un colectivo, qué hago?', a: 'Registralo en el chat de atención con la descripción del objeto, el día, el horario y el ramal. Te damos un número para seguirlo y te avisamos si aparece. Los objetos se guardan en la terminal de La Tablada.' },
   { q: '¿Puedo viajar con mi mascota?', a: 'Sí, si es pequeña y va dentro de un transportador o bolso cerrado. Los perros de asistencia pueden viajar siempre.' },

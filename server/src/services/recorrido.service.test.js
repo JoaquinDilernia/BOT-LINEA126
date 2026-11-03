@@ -95,13 +95,36 @@ test('seed Línea 126: estructura válida', () => {
       assert.ok(p.seccion >= 1 && p.seccion <= 9, `sección inválida en ${p.nombre}`);
       assert.ok(Number.isFinite(p.lat) && Number.isFinite(p.lng), `coords inválidas en ${p.nombre}`);
     }
-    // las cabeceras quedan en los tramos de punta
-    assert.equal(r.paradas.ida[0].seccion, 9);
-    assert.equal(r.paradas.ida.at(-1).seccion, 1);
+    // ida = hacia Retiro: sale de provincia (sección 1) y termina en Retiro (9); la vuelta al revés
+    assert.equal(r.paradas.ida[0].seccion, 1);
+    assert.equal(r.paradas.ida.at(-1).seccion, 9);
+    assert.equal(r.paradas.vuelta[0].seccion, 9);
+    assert.equal(r.paradas.vuelta.at(-1).seccion, 1);
+    // las secciones nunca retroceden dentro de un sentido
+    r.paradas.ida.forEach((p, i, a) => i && assert.ok(p.seccion >= a[i - 1].seccion, `ida: ${p.nombre}`));
+    r.paradas.vuelta.forEach((p, i, a) => i && assert.ok(p.seccion <= a[i - 1].seccion, `vuelta: ${p.nombre}`));
   }
-  const out = formatRecorridoParaPrompt(RECORRIDOS_126[0]);
+  const [a, b] = RECORRIDOS_126;
+  assert.equal(a.paradas.ida.length, 89);
+  assert.equal(a.paradas.vuelta.length, 93);
+  assert.match(a.paradas.ida[0].direccion, /Maradona 4920/);
+  assert.match(a.paradas.ida.at(-1).direccion, /Inmigrantes 1950/);
+  assert.match(b.paradas.ida[0].direccion, /León Gallo 4391/);
+  assert.match(b.paradas.vuelta.at(-1).direccion, /Ambrosetti 4420/);
+  const out = formatRecorridoParaPrompt(a);
   assert.match(out, /Línea 126 — Ramal A/);
   assert.match(out, /hasta acá \$742,81/);
+  assert.match(out, /Hacia Retiro:/);
+  assert.match(out, /S5 · Av Directorio y Puan \(Av Directorio 1310\) · Parque Chacabuco · cerca: Fac Filosofia/);
+});
+
+test('prompt 126: el ramal B no repite las paradas que comparte con el A', () => {
+  const ya = new Set();
+  formatRecorridoParaPrompt(RECORRIDOS_126[0], ya);
+  const outB = formatRecorridoParaPrompt(RECORRIDOS_126[1], ya);
+  assert.match(outB, /Pedro León Gallo y Peribebuy/);
+  assert.match(outB, /paradas iguales a las del ramal anterior|sigue igual que el ramal anterior/);
+  assert.doesNotMatch(outB, /Av Directorio y Puan/);
 });
 
 test('calcularTarifa 126: Retiro → La Tablada es la tarifa máxima, un tramo es la mínima', () => {
@@ -109,4 +132,12 @@ test('calcularTarifa 126: Retiro → La Tablada es la tarifa máxima, un tramo e
   assert.equal(calcularTarifa(a, 9, 1).precio, 1151.36);
   assert.equal(calcularTarifa(a, 4, 4).precio, 742.81);
   assert.equal(calcularTarifa(a, 6, 8).precio, 1002.8);
+});
+
+test('conservarDetalle: editar como texto no borra dirección, lugares ni coordenadas', async () => {
+  const { conservarDetalle } = await import('./recorrido.service.js');
+  const antes = [{ orden: 1, nombre: 'Av Directorio y Puan', seccion: 5, direccion: 'Av Directorio 1310', cercania: 'Fac Filosofia', lat: -34.63, lng: -58.44 }];
+  const despues = conservarDetalle([{ orden: 1, nombre: 'Av Directorio y Puan', seccion: 6 }, { orden: 2, nombre: 'Nueva', seccion: 6 }], antes);
+  assert.deepEqual(despues[0], { orden: 1, nombre: 'Av Directorio y Puan', seccion: 6, direccion: 'Av Directorio 1310', cercania: 'Fac Filosofia', lat: -34.63, lng: -58.44 });
+  assert.deepEqual(despues[1], { orden: 2, nombre: 'Nueva', seccion: 6 });
 });

@@ -7,7 +7,7 @@ const COLLECTION = 'bot-linea126_knowledge_base';
 // y la diagramación Invierno 2026. Se siembra sólo si la KB está vacía; una
 // vez que la empresa la edita desde el panel, esto no se vuelve a tocar.
 // Precios: van en el Tarifario y en las secciones de Recorridos, no acá.
-const SEED_KNOWLEDGE = [
+export const SEED_KNOWLEDGE = [
   {
     title: 'La empresa',
     order: 1,
@@ -21,7 +21,7 @@ Flota moderna con unidades con aire acondicionado y unidades accesibles (piso ba
     order: 2,
     content: `La 126 tiene 6 ramales (letra en el cartel):
 - Ramal A — Retiro ⇄ La Tablada (Av. D. A. Maradona 4920). Servicio común, todos los días.
-- Ramal B — Retiro ⇄ Cementerio de Villegas (Peribebuy y Mocoretá, San Justo). Servicio común, todos los días.
+- Ramal B — Retiro ⇄ Cementerio de Villegas (Ambrosetti y Peribebuy / Pedro León Gallo y Peribebuy, Villegas). Servicio común, todos los días.
 - Ramal C — Av. Directorio y Av. José María Moreno (Caballito/Parque Chacabuco) ⇄ La Tablada. Sólo días hábiles de 7:00 a 10:30.
 - Ramal D — Av. Directorio y Av. José María Moreno ⇄ Cementerio de Villegas. Sólo días hábiles de 7:00 a 10:30.
 - Ramal E — Retiro ⇄ La Tablada EXPRESO por Autopista 25 de Mayo (AU1) y Perito Moreno (AU6). Días hábiles: hacia Retiro de 7:40 a 9:40; hacia La Tablada de 17:30 a 19:30.
@@ -32,11 +32,13 @@ Cabecera Retiro: Av. de los Inmigrantes entre Cabo Pablo T. Fels y Av. Antártid
   {
     title: 'Por dónde pasa',
     order: 3,
-    content: `Recorrido principal (ramales A y B), de Retiro hacia provincia: Av. de los Inmigrantes, Av. Antártida Argentina, Av. Ramos Mejía, Metrobús del Bajo (Av. del Libertador / L. N. Alem), Av. Rivadavia, Bolívar, Av. Julio A. Roca, Av. Belgrano, Carlos Calvo, Lima, Humberto 1º, Maza, Av. Carlos Calvo, Av. Pedro Goyena, Av. Juan B. Alberdi, Av. Bruix, Av. Directorio, Av. Coronel Cárdenas, Av. Eva Perón, cruce de la Av. General Paz, Av. Intendente Esteban Crovara y Av. D. A. Maradona hasta el 4920 (ramal A) o Ambrosetti y Peribebuy hasta Mocoretá (ramal B).
-Hacia Retiro vuelve por Av. Crovara, Av. Eva Perón, Guaminí, Av. Coronel Cárdenas, Av. de los Corrales, Lisandro de la Torre, Av. Directorio, Av. San Juan, Perú, Av. Belgrano, Av. Julio A. Roca, Hipólito Yrigoyen, Metrobús del Bajo (Av. La Rábida / Alem), San Martín, Dr. Martínez Zuviría, Av. Ramos Mejía y Av. Antártida Argentina.
-Barrios: Retiro, San Nicolás, Monserrat, San Telmo, Constitución, San Cristóbal, Boedo, Caballito, Parque Chacabuco, Flores, Floresta, Vélez Sarsfield, Parque Avellaneda, Mataderos (CABA) y Villa Insuperable, Villa Madero/Las Antenas, La Tablada y San Justo (La Matanza).
-Lugares a los que acerca: Estación Retiro, Torre Monumental, Plaza San Martín, Palacio Libertad (ex Correo Central), Luna Park, Plaza de Mayo, Casa Rosada, Cabildo, Catedral, Mercado de San Telmo, Hospital de Quemados, Hospital César Milstein, Hospital Santa Lucía, Facultad de Filosofía y Letras (UBA), Parque Chacabuco, Parque Avellaneda, Estadio de Nueva Chicago, Feria de Mataderos, Policlínico Actis, Clínica Santa Isabel.
-Combinaciones: trenes Mitre, San Martín y Belgrano Norte en Retiro; subte C en Retiro y a lo largo de Lima/Bernardo de Irigoyen (San Juan, Independencia); subtes A, D y E en Plaza de Mayo (Plaza de Mayo, Catedral, Bolívar); Metrobús 9 de Julio en el cruce con la avenida.
+    content: `Recorrido principal según el listado oficial de paradas de la empresa (ramales A y B):
+Hacia Retiro (ida): desde la terminal de La Tablada (Av. D. A. Maradona 4920) por Av. D. A. Maradona hasta la rotonda, Av. Crovara (La Tablada, Villa Madero), cruce de la Av. General Paz, Av. Eva Perón, Guaminí, Av. Cárdenas, Av. de los Corrales, Av. Lisandro de la Torre, Av. Directorio (Mataderos, Parque Avellaneda, Flores, Parque Chacabuco), Av. San Juan (Boedo, San Cristóbal, Constitución, San Telmo), Paseo Colón (Metrobús), Av. Belgrano, Av. Julio A. Roca, Hipólito Yrigoyen, Metrobús del Bajo por L. N. Alem, Gustavo Martínez Zuviría y Av. de los Inmigrantes (Retiro).
+Hacia La Tablada (vuelta): desde Av. de los Inmigrantes, Av. Ramos Mejía, L. N. Alem (Metrobús), Av. Rivadavia, Av. Julio A. Roca, Av. Belgrano, Paseo Colón, Av. Independencia, Lima, Humberto 1º (Constitución, San Cristóbal, Boedo), Carlos Calvo, Av. Pedro Goyena (Caballito), Av. Juan B. Alberdi (Flores, Parque Avellaneda; Metrobús), Av. Bruix, Av. Directorio (Mataderos), Av. Cárdenas, Av. Eva Perón, Av. Crovara y Av. D. A. Maradona hasta la terminal.
+Ramal B: en Av. Crovara sigue hacia Villegas por Crovara, Centenera, José C. Paz y Ambrosetti hasta Peribebuy (Cementerio de Villegas); desde Villegas sale por Pedro León Gallo, Ambrosetti, José C. Paz, Centenera y Av. Crovara.
+Barrios: Retiro, San Nicolás, Monserrat, San Telmo, Constitución, San Cristóbal, Boedo, Caballito, Parque Chacabuco, Flores, Parque Avellaneda, Mataderos (CABA) y Villa Madero, La Tablada y Villegas (La Matanza).
+Lugares a los que acerca (según la empresa): estaciones Retiro (trenes Mitre y San Martín, terminal de ómnibus), Tribunales de Retiro, Buquebus y Puerto Madero, Catalinas, Mercado de los Carruajes, Palacio Libertad, Luna Park, Plaza de Mayo, Cabildo, Banco Nación, Legislatura, Ministerio de Economía, Calle Florida, Manzana de las Luces, INDEC, Facultad de Ingeniería (UBA), UCA, Convento de Santo Domingo, Feria de San Telmo, Parque Lezama, ANSES y Registro Nacional de las Personas (Paseo Colón), Colegio Huergo, UADE, UAI, Plaza Constitución, Facultad de Ciencias Sociales, Hospital Santa Lucía, Hospital Milstein, Correo Argentino, Hospital del Quemado, AySA, Facultad de Filosofía y Letras, Parque Chacabuco, Asociación Amigos del Tranvía, Hospital Santa Isabel, UFLO, Escuela Técnica Hogar Naval, Parque Avellaneda, Hospital San Cayetano, Feria de Mataderos, Estadio y Polideportivo de Nueva Chicago, Cementerio Israelita, estación de tren La Tablada, Hiper ChangoMás, Cementerio de Villegas, Cementerio Islámico, Cementerio Armenio, Polideportivo San José y estación Justo Villegas.
+Combinaciones: trenes Mitre y San Martín en Retiro; subte C (Constitución, Av. San Juan, Independencia), subte E (Av. San Juan, Directorio y J. M. Moreno, Av. Belgrano), subte H (Av. Jujuy), subtes A y E cerca de Plaza de Mayo; Metrobús del Bajo y de Paseo Colón; Transbus T1 en Senillosa.
 El recorrido completo parada por parada y las secciones de tarifa están en el bloque de RECORRIDOS.`,
   },
   {

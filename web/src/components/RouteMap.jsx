@@ -1,6 +1,5 @@
 import { useEffect, useMemo } from 'react';
 import { CircleMarker, MapContainer, Polyline, Popup, TileLayer, Tooltip, useMap } from 'react-leaflet';
-import trazado from '../data/trazado126.json';
 import s from './RouteMap.module.css';
 
 const FALLBACK_BOUNDS = [[-34.586, -58.37], [-34.70, -58.55]];
@@ -13,18 +12,14 @@ function FitBounds({ points }) {
   return null;
 }
 
-// Mapa del ramal: trazado de referencia (sólo el A lo tiene completo; para el
-// resto se une la secuencia de paradas) + paradas del panel con su sección.
+// Mapa del ramal: la línea une las paradas reales (listado oficial, cargadas
+// en el panel) en orden, cada una con su sección.
 export default function RouteMap({ recorrido, sentido = 'ida', highlight = null, height = 480 }) {
   const paradas = useMemo(
     () => (recorrido?.paradas?.[sentido] ?? []).filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lng)),
     [recorrido, sentido],
   );
-  const esRamalA = /ramal a\b/i.test(recorrido?.nombre ?? '');
-  const linea = useMemo(() => {
-    if (esRamalA && trazado[sentido]?.length) return trazado[sentido];
-    return paradas.map((p) => [p.lat, p.lng]);
-  }, [esRamalA, sentido, paradas]);
+  const linea = useMemo(() => paradas.map((p) => [p.lat, p.lng]), [paradas]);
   const bounds = linea.length ? linea : FALLBACK_BOUNDS;
 
   return (

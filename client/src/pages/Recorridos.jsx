@@ -13,11 +13,11 @@ const EMPTY = {
   paradasIdaTexto: '', paradasVueltaTexto: '',
 };
 
-const PLACEHOLDER = `=== Sección 1: La Tablada – Crovara y Roque Simone ===
-Terminal La Tablada (Av. D. A. Maradona 4920)
-Rotonda de La Tablada
-=== Sección 2: Crovara y Roque Simone – Av. Gral. Paz ===
-Av. Crovara y Alfredo Palacios
+const PLACEHOLDER = `=== Sección 1 ===
+Av Diego A Maradona 4920
+Av Diego A Maradona y Salta
+=== Sección 2 ===
+Av Crovara 2840
 ...`;
 
 function paradasToTexto(paradas = []) {

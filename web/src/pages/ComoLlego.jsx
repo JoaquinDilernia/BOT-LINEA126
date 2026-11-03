@@ -9,8 +9,6 @@ import { useSimClock } from '../lib/useSim.js';
 import { TOTAL_KM, duracionViaje, fmtHora, minutosHasta, proximosKm } from '../lib/sim.js';
 import { buscarParada, minutosCaminando, opcionesParadas, planificar, tarifaPlan } from '../lib/planner.js';
 import { peso } from '../data/linea.js';
-import trazado from '../data/trazado126.json';
-import { distKm } from '../lib/sim.js';
 import s from './ComoLlego.module.css';
 
 const simSentido = (sentido) => (sentido === 'ida' ? 'haciaTablada' : 'haciaRetiro');
@@ -100,14 +98,7 @@ export default function ComoLlego() {
 
   const tramo = useMemo(() => {
     if (!plan) return [];
-    const porParadas = plan.stops.slice(plan.o, plan.d + 1).map((p) => [p.lat, p.lng]);
-    // Ramal A: seguir las calles del trazado real entre la parada de subida y la de bajada.
-    const linea = /ramal a/i.test(plan.recorrido.nombre) ? trazado[plan.sentido] : null;
-    if (!linea?.length) return porParadas;
-    const masCerca = (ll) => linea.reduce((b, p, i) => (distKm(ll, p) < distKm(ll, linea[b]) ? i : b), 0);
-    const i0 = masCerca(porParadas[0]);
-    const i1 = masCerca(porParadas[porParadas.length - 1]);
-    return i1 > i0 ? [porParadas[0], ...linea.slice(i0, i1 + 1), porParadas[porParadas.length - 1]] : porParadas;
+    return plan.stops.slice(plan.o, plan.d + 1).map((p) => [p.lat, p.lng]);
   }, [plan]);
   const paradasIntermedias = plan ? plan.stops.slice(plan.o + 1, plan.d).map((p) => [p.lat, p.lng]) : [];
   const lineaCompleta = plan ? plan.stops.map((p) => [p.lat, p.lng]) : [];

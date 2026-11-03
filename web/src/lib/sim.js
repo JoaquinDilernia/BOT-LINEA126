@@ -10,8 +10,8 @@ export const TOTAL_KM = SECCIONADOS[SECCIONADOS.length - 1].km;
 
 // Sentidos con la terminal de origen. haciaRetiro sale de La Tablada.
 export const SENTIDOS = {
-  haciaRetiro: { label: 'Hacia Retiro', origen: 'La Tablada', destino: 'Retiro', polyline: trazado.vuelta, idxFrecuencia: 0 },
-  haciaTablada: { label: 'Hacia La Tablada', origen: 'Retiro', destino: 'La Tablada', polyline: trazado.ida, idxFrecuencia: 1 },
+  haciaRetiro: { label: 'Hacia Retiro', origen: 'La Tablada', destino: 'Retiro', polyline: trazado.haciaRetiro, idxFrecuencia: 0 },
+  haciaTablada: { label: 'Hacia La Tablada', origen: 'Retiro', destino: 'La Tablada', polyline: trazado.haciaTablada, idxFrecuencia: 1 },
 };
 
 // ---------- geometría ----------

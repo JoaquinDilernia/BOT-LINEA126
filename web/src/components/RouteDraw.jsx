@@ -31,11 +31,11 @@ export default function RouteDraw() {
   const [head, setHead] = useState([0, 0]);
 
   const { d, hitos } = useMemo(() => {
-    const pts = proyectar(trazado.ida);
+    const pts = proyectar(trazado.haciaTablada);
     const d = pts.map(([x, y], i) => `${i ? 'L' : 'M'}${x.toFixed(1)} ${y.toFixed(1)}`).join(' ');
     // Fracción real (en km) de cada vértice, para ubicar los hitos.
     const cum = [0];
-    for (let i = 1; i < trazado.ida.length; i++) cum.push(cum[i - 1] + distKm(trazado.ida[i - 1], trazado.ida[i]));
+    for (let i = 1; i < trazado.haciaTablada.length; i++) cum.push(cum[i - 1] + distKm(trazado.haciaTablada[i - 1], trazado.haciaTablada[i]));
     const total = cum[cum.length - 1];
     const cumFrac = cum.map((c) => c / total);
     const hitos = SECCIONADOS.slice().reverse().map((h) => {
