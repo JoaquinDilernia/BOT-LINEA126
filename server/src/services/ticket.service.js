@@ -2,6 +2,7 @@ import { getDb } from './firebase.service.js';
 import { listUsers } from './auth.service.js';
 import { getAllTemplates } from './template.service.js';
 import { sendWhatsAppTemplate, sendWhatsAppMessage, sendInstagramMessage } from './meta.service.js';
+import { mailRespuestaReclamo, normalizeEmail } from './mail.service.js';
 import { DEFAULT_RESPUESTA_COMUN, DEFAULT_DEMORA_HORAS, programarRespuestaAt, renderRespuesta } from './reclamoRespuesta.js';
 import { appendMessage } from './conversation.service.js';
 import { monthKey } from './reclamoStats.js';
@@ -162,14 +163,15 @@ export async function getDefaultAssignee() {
 // quien contestarle quedan "en progreso" con la respuesta programada para
 // unas horas después (la manda enviarRespuestasProgramadas); los que no
 // tienen contacto nacen resueltos como antes. `numeroUnidad` es el interno.
-export async function createTicket({ titulo, descripcion, contactId = null, prioridad = 'media', categoria = 'otro', imagenes = [], createdBy, numeroUnidad = '', ramal = '', lugarHecho = '', horaHecho = '', canal = null, origen }) {
+export async function createTicket({ titulo, descripcion, contactId = null, prioridad = 'media', categoria = 'otro', imagenes = [], createdBy, numeroUnidad = '', ramal = '', lugarHecho = '', horaHecho = '', email = '', canal = null, origen }) {
   const db = getDb();
   const [assignedTo, numero, config] = await Promise.all([getDefaultAssignee(), nextReclamoNumero(), getReclamosConfig()]);
   const cat = CATEGORIA_IDS.includes(categoria) ? categoria : 'otro';
   const gravedad = gravedadDe({ categoria: cat, prioridad }, config);
   const now = new Date();
-  const programada = gravedad === 'comun' && !!contactId;
-  const auto = gravedad === 'comun' && !contactId;
+  const destinatario = !!contactId || !!normalizeEmail(email);
+  const programada = gravedad === 'comun' && destinatario;
+  const auto = gravedad === 'comun' && !destinatario;
   const ticket = {
     numero,
     titulo,
@@ -185,6 +187,7 @@ export async function createTicket({ titulo, descripcion, contactId = null, prio
     ramal: String(ramal ?? '').trim().toUpperCase().slice(0, 2),
     lugarHecho: String(lugarHecho ?? '').trim().slice(0, 150),
     horaHecho: String(horaHecho ?? '').trim().slice(0, 60),
+    email: normalizeEmail(email),
     canal: canal ?? (isWebContact(contactId) ? 'web' : contactId ? 'whatsapp' : null),
     estado: auto ? 'resuelto' : programada ? 'en_progreso' : 'abierto',
     imagenes,
@@ -249,7 +252,7 @@ export async function createCargaBatch(rows, createdBy) {
   return { creados: docs.length, errores };
 }
 
-export async function updateTicket(id, { titulo, descripcion, prioridad, categoria, legajoChofer, numeroUnidad, ramal, lugarHecho, horaHecho, gravedad, estado, assignedTo, imagenes } = {}) {
+export async function updateTicket(id, { titulo, descripcion, prioridad, categoria, legajoChofer, numeroUnidad, ramal, lugarHecho, horaHecho, email, gravedad, estado, assignedTo, imagenes } = {}) {
   const db = getDb();
   const docRef = db.collection(COLLECTION).doc(id);
   const before = await docRef.get();
@@ -266,6 +269,7 @@ export async function updateTicket(id, { titulo, descripcion, prioridad, categor
   if (ramal !== undefined) update.ramal = String(ramal).trim().toUpperCase().slice(0, 2);
   if (lugarHecho !== undefined) update.lugarHecho = String(lugarHecho).trim().slice(0, 150);
   if (horaHecho !== undefined) update.horaHecho = String(horaHecho).trim().slice(0, 60);
+  if (email !== undefined) update.email = normalizeEmail(email);
   if (gravedad === 'grave' || gravedad === 'comun') update.gravedad = gravedad;
   if (assignedTo !== undefined) update.assignedTo = assignedTo;
   if (imagenes !== undefined) update.imagenes = imagenes;
@@ -317,7 +321,7 @@ export async function respondTicket(id, { autor, texto }) {
   const doc = await docRef.get();
   if (!doc.exists) throw new Error('Reclamo no encontrado');
   const ticket = { id: doc.id, ...doc.data() };
-  if (!ticket.contactId) throw new Error('Este reclamo no tiene un contacto asociado');
+  if (!ticket.contactId && !ticket.email) throw new Error('Este reclamo no tiene un contacto asociado');
 
   const respuesta = { autor, texto, createdAt: new Date() };
   const respuestas = [...(ticket.respuestas ?? []), respuesta];
@@ -334,8 +338,8 @@ export async function respondTicket(id, { autor, texto }) {
   // Un reclamo que entró por el chat del sitio (contactId "web:<sesión>") no
   // tiene a dónde mandarse por WhatsApp: la respuesta queda en la
   // conversación y el pasajero la ve en el chat o en "Seguí tu reclamo".
-  let notificationStatus = isWebContact(ticket.contactId) ? 'web' : 'sent';
-  if (!isWebContact(ticket.contactId)) {
+  let notificationStatus = isWebContact(ticket.contactId) || !ticket.contactId ? 'web' : 'sent';
+  if (ticket.contactId && !isWebContact(ticket.contactId)) {
     try {
       await sendWhatsAppMessage(ticket.contactId, mensaje);
     } catch (err) {
@@ -343,12 +347,13 @@ export async function respondTicket(id, { autor, texto }) {
       notificationStatus = 'failed';
     }
   }
-  await docRef.update({ notificationStatus }).catch(() => {});
+  const emailStatus = await mailRespuestaReclamo(ticket, mensaje);
+  await docRef.update({ notificationStatus, ...(emailStatus !== 'none' && { emailStatus }) }).catch(() => {});
 
   // Se guarda en el historial de la conversación (role: 'admin', igual que
   // cuando un agente manda un WhatsApp manual) para que quien revise el
   // chat del pasajero vea la respuesta ahí también, no solo en el reclamo.
-  await appendMessage(ticket.contactId, { role: 'admin', content: mensaje, sentBy: autor }).catch(() => {});
+  if (ticket.contactId) await appendMessage(ticket.contactId, { role: 'admin', content: mensaje, sentBy: autor }).catch(() => {});
 
   const after = await docRef.get();
   return { id: after.id, ...after.data() };
@@ -391,12 +396,12 @@ export async function enviarRespuestasProgramadas(now = new Date()) {
     const t = { id: doc.id, ...doc.data() };
     const at = toDate(t.respuestaProgramadaAt);
     if (!at || at > now) continue;
-    if (t.gravedad !== 'comun' || ['resuelto', 'cerrado'].includes(t.estado) || !t.contactId) {
+    if (t.gravedad !== 'comun' || ['resuelto', 'cerrado'].includes(t.estado) || (!t.contactId && !t.email)) {
       await doc.ref.update({ notificationStatus: 'cancelled' }).catch(() => {});
       continue;
     }
     const texto = renderRespuesta(config.respuestaComun, t);
-    const canal = t.canal ?? (isWebContact(t.contactId) ? 'web' : 'whatsapp');
+    const canal = t.canal ?? (isWebContact(t.contactId) || !t.contactId ? 'web' : 'whatsapp');
     let notificationStatus = canal === 'web' ? 'web' : 'sent';
     try {
       if (canal === 'whatsapp') await sendWhatsAppMessage(t.contactId, texto);
@@ -405,17 +410,19 @@ export async function enviarRespuestasProgramadas(now = new Date()) {
       console.error(`[ticket] Error mandando respuesta programada de ${t.numero}:`, err.response?.data ?? err.message);
       notificationStatus = 'failed';
     }
+    const emailStatus = await mailRespuestaReclamo(t, texto);
     const sentAt = new Date();
     await doc.ref.update({
       notificationStatus,
+      ...(emailStatus !== 'none' && { emailStatus }),
       estado: 'resuelto',
       resolvedAt: sentAt,
       updatedAt: sentAt,
       respuestas: [...(t.respuestas ?? []), { autor: 'Respuesta automática', texto, automatica: true, createdAt: sentAt }],
     });
-    await appendMessage(t.contactId, { role: 'admin', content: texto, sentBy: 'Respuesta automática' }).catch(() => {});
-    if (notificationStatus !== 'failed') enviadas++;
-    console.log(`[ticket] Respuesta programada de ${t.numero}: ${notificationStatus}`);
+    if (t.contactId) await appendMessage(t.contactId, { role: 'admin', content: texto, sentBy: 'Respuesta automática' }).catch(() => {});
+    if (notificationStatus !== 'failed' || emailStatus === 'sent') enviadas++;
+    console.log(`[ticket] Respuesta programada de ${t.numero}: ${notificationStatus} / mail ${emailStatus}`);
   }
   return enviadas;
 }

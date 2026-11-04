@@ -11,7 +11,8 @@ import {
   addLabelToConversation,
 } from './conversation.service.js';
 import { sendWhatsAppMessage, sendInstagramMessage, downloadMediaAsBase64 } from './meta.service.js';
-import { getOrCreateCustomer, buildCustomerContext } from './customer.service.js';
+import { getOrCreateCustomer, buildCustomerContext, updateCustomer } from './customer.service.js';
+import { normalizeEmail } from './mail.service.js';
 import { getAllLabels, createLabel } from './label.service.js';
 import { getTarifarioPrompt } from './tarifa.service.js';
 import { getRecorridosPrompt } from './recorrido.service.js';
@@ -343,6 +344,27 @@ async function processIncomingMessageInternal(msg) {
     internoReclamo = check.interno;
   }
 
+  // Red de seguridad del email obligatorio (la respuesta sale por mail).
+  // Si Claude no lo trajo, se usa el que ya está en la ficha del contacto.
+  let emailReclamo = '';
+  if (shouldCreateReclamo && reclamoParams) {
+    emailReclamo = normalizeEmail(reclamoParams.email) || normalizeEmail(customer?.email);
+    if (!emailReclamo) {
+      const dado = String(reclamoParams.email ?? '').trim();
+      const pedido = dado
+        ? `El mail *${dado}* no parece válido, así que todavía no pude registrar el reclamo. ¿Lo revisás? Tiene que ser del estilo nombre@gmail.com.`
+        : 'Para registrar el reclamo necesito tu *email*: la respuesta te la mandamos por mail. ¿Me lo pasás?';
+      console.log(`[bot] Reclamo NO creado para ${from}: email ${dado ? 'inválido' : 'faltante'}`);
+      await appendMessage(from, { role: 'assistant', content: pedido });
+      if (channel === 'whatsapp') await sendWhatsAppMessage(from, pedido).catch(() => {});
+      else if (channel === 'instagram') await sendInstagramMessage(from, pedido).catch(() => {});
+      return;
+    }
+    if (emailReclamo !== normalizeEmail(customer?.email)) {
+      await updateCustomer(from, { email: emailReclamo }).catch(err => console.error('[bot] No se pudo guardar el email en el contacto:', err.message));
+    }
+  }
+
   if (shouldCreateReclamo && reclamoParams) {
     try {
       // Si el mensaje que disparó el reclamo era una imagen, se adjunta esa.
@@ -367,6 +389,7 @@ async function processIncomingMessageInternal(msg) {
         ramal: /^[A-F]$/i.test(String(reclamoParams.ramal ?? '').trim()) ? String(reclamoParams.ramal).trim() : '',
         lugarHecho: String(reclamoParams.lugar ?? '').trim(),
         horaHecho: String(reclamoParams.hora ?? '').trim(),
+        email: emailReclamo,
         canal: channel,
         createdBy: 'bot',
       });
@@ -377,9 +400,9 @@ async function processIncomingMessageInternal(msg) {
       // lo responde una persona.
       const webHint = channel === 'web' ? ' Podés consultarlo cuando quieras en *Seguí tu reclamo*, en el sitio.' : '';
       const confirmMsg = reclamo.gravedad === 'grave'
-        ? `✅ Reclamo *N° ${reclamo.numero}* registrado. Por la gravedad de lo que contás lo revisa personalmente el equipo de la línea y te vamos a responder por acá. Guardá este número.${webHint}`
+        ? `✅ Reclamo *N° ${reclamo.numero}* registrado. Por la gravedad de lo que contás lo revisa personalmente el equipo de la línea y te vamos a responder por acá y a *${reclamo.email}*. Guardá este número.${webHint}`
         : reclamo.notificationStatus === 'scheduled'
-        ? `✅ Reclamo *N° ${reclamo.numero}* registrado. Lo pasamos al área de tráfico para identificar la unidad y al chofer, y en unas horas te escribimos por acá con la respuesta. Guardá este número.${webHint}`
+        ? `✅ Reclamo *N° ${reclamo.numero}* registrado. Lo pasamos al área de tráfico para identificar la unidad y al chofer, y en unas horas te mandamos la respuesta a *${reclamo.email}*. Guardá este número.${webHint}`
         : `✅ Reclamo *N° ${reclamo.numero}* registrado.\n\n${reclamo.respuestas?.[0]?.texto ?? ''}\n\nGuardá este número por las dudas.${webHint}`;
       await appendMessage(from, { role: 'assistant', content: confirmMsg });
       if (channel === 'whatsapp') await sendWhatsAppMessage(from, confirmMsg).catch(() => {});

@@ -52,6 +52,7 @@ export function buildCustomerContext(customer) {
 
   const lines = [];
   if (customer.contactName) lines.push(`Nombre: ${customer.contactName}`);
+  if (customer.email) lines.push(`Email: ${customer.email}`);
   lines.push(`Canal: ${customer.channel}`);
   if (customer.firstContactAt) lines.push(`Primera consulta: ${formatDate(customer.firstContactAt)}`);
 

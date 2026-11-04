@@ -273,6 +273,12 @@ export default function Reclamos() {
                 🕒 Respuesta automática programada para el {new Date(selected.respuestaProgramadaAt?._seconds ? selected.respuestaProgramadaAt._seconds * 1000 : selected.respuestaProgramadaAt).toLocaleString('es-AR', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}. Si lo respondés a mano, lo cerrás o lo pasás a grave antes, no se manda.
               </div>
             )}
+            {selected.emailStatus === 'sent' && (
+              <div className={styles.notifyOk}>✉️ Respuesta enviada por mail a {selected.email}.</div>
+            )}
+            {selected.emailStatus === 'failed' && (
+              <div className={styles.notifyWarning}>⚠️ No se pudo mandar el mail a {selected.email || '—'}. Revisá el email o la configuración de Resend.</div>
+            )}
             {selected.notificationStatus === 'sent' && selected.estado === 'resuelto' && (
               <div className={styles.notifyOk}>✓ Pasajero notificado por WhatsApp.</div>
             )}
@@ -343,6 +349,16 @@ export default function Reclamos() {
                   defaultValue={selected.horaHecho ?? ''}
                   placeholder="Ej: 18:30"
                   onBlur={e => { if (e.target.value !== (selected.horaHecho ?? '')) updateSelected({ horaHecho: e.target.value.trim() }); }}
+                />
+              </label>
+              <label className={styles.field}>
+                <span>Email del pasajero</span>
+                <input
+                  key={`email-${selected.id}`}
+                  type="email"
+                  defaultValue={selected.email ?? ''}
+                  placeholder="pasajero@gmail.com"
+                  onBlur={e => { if (e.target.value.trim() !== (selected.email ?? '')) updateSelected({ email: e.target.value.trim() }); }}
                 />
               </label>
             </div>
