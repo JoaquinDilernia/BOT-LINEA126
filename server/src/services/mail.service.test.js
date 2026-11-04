@@ -15,6 +15,8 @@ test('buildReclamoEmail pasa *negrita* a <b>, escapa HTML y agrega el link', () 
   assert.match(subject, /R126-000007/);
   assert.match(html, /<b>N° R126-000007<\/b>/);
   assert.match(html, /Gracias &lt;3/);
-  assert.match(html, /https:\/\/l126\.ar\/reclamos#seguimiento/);
+  assert.ok(html.includes('https://l126.ar/?reclamo=R126-000007#/reclamos'));
+  assert.ok(html.includes('?chat=1&amp;reclamo=R126-000007'));
+  assert.match(html, /no recibe respuestas/);
   assert.doesNotMatch(text, /\*/);
 });

@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { reclamoDeUrl } from '../lib/chat.jsx';
 import { IconCheck, IconSearch } from './icons.jsx';
 import { apiGet } from '../lib/api.js';
 import s from './Seguimiento.module.css';
@@ -14,11 +15,14 @@ const fecha = (iso) => (iso ? new Date(iso).toLocaleDateString('es-AR', { day: '
 
 // "Consultá el estado de tu reclamo": en la página de Reclamos y en el inicio.
 export default function Seguimiento({ idPrefix = 'seg', className = '' }) {
-  const [numero, setNumero] = useState('');
+  const [numero, setNumero] = useState(() => reclamoDeUrl());
   const [estado, setEstado] = useState({ loading: false, error: '', reclamo: null });
 
+  // Desde el link del mail (?reclamo=...) se busca solo.
+  useEffect(() => { if (numero) buscar(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   async function buscar(e) {
-    e.preventDefault();
+    e?.preventDefault();
     let n = numero.trim().toUpperCase().replace(/\s+/g, '');
     if (/^\d{1,6}$/.test(n)) n = `R126-${n.padStart(6, '0')}`;
     if (!/^R126-\d{6}$/.test(n)) {
