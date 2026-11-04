@@ -268,6 +268,11 @@ export default function Reclamos() {
             {selected.notificationStatus === 'failed' && (
               <div className={styles.notifyWarning}>⚠️ Falló el envío de la última respuesta por WhatsApp. Revisá los logs del servidor o probá de nuevo.</div>
             )}
+            {selected.notificationStatus === 'scheduled' && (
+              <div className={styles.notifyOk}>
+                🕒 Respuesta automática programada para el {new Date(selected.respuestaProgramadaAt?._seconds ? selected.respuestaProgramadaAt._seconds * 1000 : selected.respuestaProgramadaAt).toLocaleString('es-AR', { day: 'numeric', month: 'numeric', hour: '2-digit', minute: '2-digit' })}. Si lo respondés a mano, lo cerrás o lo pasás a grave antes, no se manda.
+              </div>
+            )}
             {selected.notificationStatus === 'sent' && selected.estado === 'resuelto' && (
               <div className={styles.notifyOk}>✓ Pasajero notificado por WhatsApp.</div>
             )}
@@ -321,7 +326,27 @@ export default function Reclamos() {
                 />
               </label>
             </div>
-            <p className={styles.respondHint}>Chofer, interno y ramal alimentan las estadísticas de Gestión de reclamos.</p>
+            <div className={styles.detailRow}>
+              <label className={styles.field}>
+                <span>Lugar</span>
+                <input
+                  key={`lugar-${selected.id}`}
+                  defaultValue={selected.lugarHecho ?? ''}
+                  placeholder="Ej: Av. Crovara 2500"
+                  onBlur={e => { if (e.target.value !== (selected.lugarHecho ?? '')) updateSelected({ lugarHecho: e.target.value.trim() }); }}
+                />
+              </label>
+              <label className={styles.field}>
+                <span>Hora</span>
+                <input
+                  key={`hora-${selected.id}`}
+                  defaultValue={selected.horaHecho ?? ''}
+                  placeholder="Ej: 18:30"
+                  onBlur={e => { if (e.target.value !== (selected.horaHecho ?? '')) updateSelected({ horaHecho: e.target.value.trim() }); }}
+                />
+              </label>
+            </div>
+            <p className={styles.respondHint}>Chofer, interno y ramal alimentan las estadísticas de Gestión de reclamos. Interno, ramal, lugar y hora se usan en la respuesta automática.</p>
 
             <p className={styles.detailMeta}><strong>Creado por:</strong> {selected.createdBy === 'bot' ? '🤖 Bot' : selected.createdBy}</p>
             <p className={styles.detailMeta}><strong>Asignado a:</strong> {selected.assignedTo ?? 'Sin asignar'}</p>

@@ -1,7 +1,8 @@
 import { getDb } from './firebase.service.js';
 import { listUsers } from './auth.service.js';
 import { getAllTemplates } from './template.service.js';
-import { sendWhatsAppTemplate, sendWhatsAppMessage } from './meta.service.js';
+import { sendWhatsAppTemplate, sendWhatsAppMessage, sendInstagramMessage } from './meta.service.js';
+import { DEFAULT_RESPUESTA_COMUN, DEFAULT_DEMORA_HORAS, programarRespuestaAt, renderRespuesta } from './reclamoRespuesta.js';
 import { appendMessage } from './conversation.service.js';
 import { monthKey } from './reclamoStats.js';
 
@@ -42,6 +43,11 @@ export const DEFAULT_RECLAMOS_CONFIG = {
   // Objeto perdido y sugerencias quedan afuera: muchas veces el pasajero no
   // lo vio y igual queremos registrar el caso.
   categoriasSinInterno: ['objeto_perdido', 'otro'],
+  // Plantilla de la respuesta diferida de los comunes (ver reclamoRespuesta.js).
+  // `respuestaAutomatica` queda sólo para reclamos sin contacto (cargados
+  // desde el panel), que se resuelven al instante como antes.
+  respuestaComun: DEFAULT_RESPUESTA_COMUN,
+  demoraRespuestaHoras: DEFAULT_DEMORA_HORAS,
 };
 
 export async function getReclamosConfig() {
@@ -49,11 +55,13 @@ export async function getReclamosConfig() {
   return { ...DEFAULT_RECLAMOS_CONFIG, ...(doc.exists ? doc.data() : {}) };
 }
 
-export async function updateReclamosConfig({ categoriasGraves, respuestaAutomatica, categoriasSinInterno } = {}) {
+export async function updateReclamosConfig({ categoriasGraves, respuestaAutomatica, categoriasSinInterno, respuestaComun, demoraRespuestaHoras } = {}) {
   const update = { updatedAt: new Date() };
   if (Array.isArray(categoriasGraves)) update.categoriasGraves = categoriasGraves.filter(c => CATEGORIA_IDS.includes(c));
   if (Array.isArray(categoriasSinInterno)) update.categoriasSinInterno = categoriasSinInterno.filter(c => CATEGORIA_IDS.includes(c));
   if (typeof respuestaAutomatica === 'string' && respuestaAutomatica.trim()) update.respuestaAutomatica = respuestaAutomatica.trim().slice(0, 1500);
+  if (typeof respuestaComun === 'string' && respuestaComun.trim()) update.respuestaComun = respuestaComun.trim().slice(0, 1500);
+  if (demoraRespuestaHoras !== undefined && demoraRespuestaHoras !== '' && Number.isFinite(Number(demoraRespuestaHoras))) update.demoraRespuestaHoras = Math.min(Math.max(Number(demoraRespuestaHoras), 0), 20);
   await CONFIG_REF().set(update, { merge: true });
   return getReclamosConfig();
 }
@@ -150,15 +158,18 @@ export async function getDefaultAssignee() {
   return admin?.email ?? null;
 }
 
-// Los comunes nacen ya respondidos (respuesta automática de la config) y
-// los graves quedan abiertos en la bandeja. `numeroUnidad` es el interno.
-export async function createTicket({ titulo, descripcion, contactId = null, prioridad = 'media', categoria = 'otro', imagenes = [], createdBy, numeroUnidad = '', ramal = '', origen }) {
+// Los graves quedan abiertos en la bandeja. Los comunes con un pasajero a
+// quien contestarle quedan "en progreso" con la respuesta programada para
+// unas horas después (la manda enviarRespuestasProgramadas); los que no
+// tienen contacto nacen resueltos como antes. `numeroUnidad` es el interno.
+export async function createTicket({ titulo, descripcion, contactId = null, prioridad = 'media', categoria = 'otro', imagenes = [], createdBy, numeroUnidad = '', ramal = '', lugarHecho = '', horaHecho = '', canal = null, origen }) {
   const db = getDb();
   const [assignedTo, numero, config] = await Promise.all([getDefaultAssignee(), nextReclamoNumero(), getReclamosConfig()]);
   const cat = CATEGORIA_IDS.includes(categoria) ? categoria : 'otro';
   const gravedad = gravedadDe({ categoria: cat, prioridad }, config);
   const now = new Date();
-  const auto = gravedad === 'comun';
+  const programada = gravedad === 'comun' && !!contactId;
+  const auto = gravedad === 'comun' && !contactId;
   const ticket = {
     numero,
     titulo,
@@ -172,13 +183,17 @@ export async function createTicket({ titulo, descripcion, contactId = null, prio
     legajoChofer: '',
     numeroUnidad: String(numeroUnidad ?? '').trim(),
     ramal: String(ramal ?? '').trim().toUpperCase().slice(0, 2),
-    estado: auto ? 'resuelto' : 'abierto',
+    lugarHecho: String(lugarHecho ?? '').trim().slice(0, 150),
+    horaHecho: String(horaHecho ?? '').trim().slice(0, 60),
+    canal: canal ?? (isWebContact(contactId) ? 'web' : contactId ? 'whatsapp' : null),
+    estado: auto ? 'resuelto' : programada ? 'en_progreso' : 'abierto',
     imagenes,
     createdBy,
     assignedTo,
     comentarios: [],
     respuestas: auto ? [{ autor: 'Respuesta automática', texto: config.respuestaAutomatica, automatica: true, createdAt: now }] : [],
     ...(auto && { notificationStatus: 'auto' }),
+    ...(programada && { notificationStatus: 'scheduled', respuestaProgramadaAt: programarRespuestaAt(now, config.demoraRespuestaHoras) }),
     createdAt: now,
     updatedAt: now,
     resolvedAt: auto ? now : null,
@@ -234,7 +249,7 @@ export async function createCargaBatch(rows, createdBy) {
   return { creados: docs.length, errores };
 }
 
-export async function updateTicket(id, { titulo, descripcion, prioridad, categoria, legajoChofer, numeroUnidad, ramal, gravedad, estado, assignedTo, imagenes } = {}) {
+export async function updateTicket(id, { titulo, descripcion, prioridad, categoria, legajoChofer, numeroUnidad, ramal, lugarHecho, horaHecho, gravedad, estado, assignedTo, imagenes } = {}) {
   const db = getDb();
   const docRef = db.collection(COLLECTION).doc(id);
   const before = await docRef.get();
@@ -249,6 +264,8 @@ export async function updateTicket(id, { titulo, descripcion, prioridad, categor
   if (legajoChofer !== undefined) update.legajoChofer = legajoChofer;
   if (numeroUnidad !== undefined) update.numeroUnidad = numeroUnidad;
   if (ramal !== undefined) update.ramal = String(ramal).trim().toUpperCase().slice(0, 2);
+  if (lugarHecho !== undefined) update.lugarHecho = String(lugarHecho).trim().slice(0, 150);
+  if (horaHecho !== undefined) update.horaHecho = String(horaHecho).trim().slice(0, 60);
   if (gravedad === 'grave' || gravedad === 'comun') update.gravedad = gravedad;
   if (assignedTo !== undefined) update.assignedTo = assignedTo;
   if (imagenes !== undefined) update.imagenes = imagenes;
@@ -355,4 +372,50 @@ async function notifyTicketResolved(ticket) {
     await db.collection(COLLECTION).doc(ticket.id).update({ notificationStatus: 'failed' }).catch(() => {});
     throw err;
   }
+}
+
+const toDate = (v) => (v?.toDate ? v.toDate() : v ? new Date(v) : null);
+
+// Corre cada pocos minutos (app.js): manda la respuesta de los comunes cuya
+// hora programada ya pasó. Filtra por un solo campo (sin índice compuesto)
+// y la fecha en memoria — siempre son pocos pendientes.
+// Si mientras tanto un agente lo pasó a grave, lo respondió a mano o lo
+// cerró, no se manda nada.
+export async function enviarRespuestasProgramadas(now = new Date()) {
+  const db = getDb();
+  const snap = await db.collection(COLLECTION).where('notificationStatus', '==', 'scheduled').get();
+  if (snap.empty) return 0;
+  const config = await getReclamosConfig();
+  let enviadas = 0;
+  for (const doc of snap.docs) {
+    const t = { id: doc.id, ...doc.data() };
+    const at = toDate(t.respuestaProgramadaAt);
+    if (!at || at > now) continue;
+    if (t.gravedad !== 'comun' || ['resuelto', 'cerrado'].includes(t.estado) || !t.contactId) {
+      await doc.ref.update({ notificationStatus: 'cancelled' }).catch(() => {});
+      continue;
+    }
+    const texto = renderRespuesta(config.respuestaComun, t);
+    const canal = t.canal ?? (isWebContact(t.contactId) ? 'web' : 'whatsapp');
+    let notificationStatus = canal === 'web' ? 'web' : 'sent';
+    try {
+      if (canal === 'whatsapp') await sendWhatsAppMessage(t.contactId, texto);
+      else if (canal === 'instagram') await sendInstagramMessage(t.contactId, texto);
+    } catch (err) {
+      console.error(`[ticket] Error mandando respuesta programada de ${t.numero}:`, err.response?.data ?? err.message);
+      notificationStatus = 'failed';
+    }
+    const sentAt = new Date();
+    await doc.ref.update({
+      notificationStatus,
+      estado: 'resuelto',
+      resolvedAt: sentAt,
+      updatedAt: sentAt,
+      respuestas: [...(t.respuestas ?? []), { autor: 'Respuesta automática', texto, automatica: true, createdAt: sentAt }],
+    });
+    await appendMessage(t.contactId, { role: 'admin', content: texto, sentBy: 'Respuesta automática' }).catch(() => {});
+    if (notificationStatus !== 'failed') enviadas++;
+    console.log(`[ticket] Respuesta programada de ${t.numero}: ${notificationStatus}`);
+  }
+  return enviadas;
 }

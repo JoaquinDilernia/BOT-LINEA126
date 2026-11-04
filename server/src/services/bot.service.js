@@ -365,15 +365,21 @@ async function processIncomingMessageInternal(msg) {
         imagenes: imageMediaId ? [{ mediaId: imageMediaId, mimeType: 'image/jpeg' }] : [],
         numeroUnidad: internoReclamo,
         ramal: /^[A-F]$/i.test(String(reclamoParams.ramal ?? '').trim()) ? String(reclamoParams.ramal).trim() : '',
+        lugarHecho: String(reclamoParams.lugar ?? '').trim(),
+        horaHecho: String(reclamoParams.hora ?? '').trim(),
+        canal: channel,
         createdBy: 'bot',
       });
       console.log(`[bot] Reclamo ${reclamo.numero} (${reclamo.gravedad}) creado para ${from}`);
 
-      // Común: ya nace respondido con la respuesta automática. Grave: queda
-      // en la bandeja del panel y lo responde una persona.
+      // Común: el número ahora y la respuesta unas horas después (la manda
+      // enviarRespuestasProgramadas). Grave: queda en la bandeja del panel y
+      // lo responde una persona.
       const webHint = channel === 'web' ? ' Podés consultarlo cuando quieras en *Seguí tu reclamo*, en el sitio.' : '';
       const confirmMsg = reclamo.gravedad === 'grave'
         ? `✅ Reclamo *N° ${reclamo.numero}* registrado. Por la gravedad de lo que contás lo revisa personalmente el equipo de la línea y te vamos a responder por acá. Guardá este número.${webHint}`
+        : reclamo.notificationStatus === 'scheduled'
+        ? `✅ Reclamo *N° ${reclamo.numero}* registrado. Lo pasamos al área de tráfico para identificar la unidad y al chofer, y en unas horas te escribimos por acá con la respuesta. Guardá este número.${webHint}`
         : `✅ Reclamo *N° ${reclamo.numero}* registrado.\n\n${reclamo.respuestas?.[0]?.texto ?? ''}\n\nGuardá este número por las dudas.${webHint}`;
       await appendMessage(from, { role: 'assistant', content: confirmMsg });
       if (channel === 'whatsapp') await sendWhatsAppMessage(from, confirmMsg).catch(() => {});

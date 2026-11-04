@@ -33,6 +33,7 @@ import { seedTarifasIfNeeded } from './services/tarifa.service.js';
 import { seedRecorridosIfNeeded } from './services/recorrido.service.js';
 import { requireAuth, requireAtLeastAtencionCliente } from './middleware/requireAuth.js';
 import { closeIdleBotConversations } from './services/botAutoClose.js';
+import { enviarRespuestasProgramadas } from './services/ticket.service.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -135,5 +136,10 @@ app.listen(PORT, () => {
 const runAutoClose = () => closeIdleBotConversations().catch(err => console.error('[autoClose] Error:', err.message));
 setTimeout(runAutoClose, 2 * 60 * 1000);
 setInterval(runAutoClose, 30 * 60 * 1000);
+
+// Cada 5 min: respuesta diferida de los reclamos comunes (ver reclamoRespuesta.js).
+const runRespuestas = () => enviarRespuestasProgramadas().catch(err => console.error('[reclamos] Error respuestas programadas:', err.message));
+setTimeout(runRespuestas, 60 * 1000);
+setInterval(runRespuestas, 5 * 60 * 1000);
 
 export default app;

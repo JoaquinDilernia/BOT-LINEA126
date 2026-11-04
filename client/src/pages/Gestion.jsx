@@ -81,8 +81,15 @@ function Criterios({ onSaved }) {
         </fieldset>
       </div>
       <label className={styles.field}>
-        <span>Respuesta automática para los reclamos comunes</span>
-        <textarea rows={3} value={config.respuestaAutomatica} onChange={e => setConfig({ ...config, respuestaAutomatica: e.target.value })} />
+        <span>Respuesta a los reclamos comunes (se manda sola unas horas después del reclamo)</span>
+        <textarea rows={8} value={config.respuestaComun ?? ''} onChange={e => setConfig({ ...config, respuestaComun: e.target.value })} />
+      </label>
+      <p className={styles.hint}>
+        Se completa con los datos del reclamo: <b>{'{numero}'}</b> N° de reclamo · <b>{'{interno}'}</b> · <b>{'{ramal}'}</b> · <b>{'{hora}'}</b> · <b>{'{lugar}'}</b> · <b>{'{viaje}'}</b> arma la frase entera con lo que haya (ej. “el interno 36 del ramal A, cerca de las 18:30, en Av. Crovara 2500”). Nunca se manda entre las 22 y las 8: se corre a las 8.
+      </p>
+      <label className={styles.field} style={{ maxWidth: 220 }}>
+        <span>Mandarla a las (horas)</span>
+        <input type="number" min={0} max={20} step={0.5} value={config.demoraRespuestaHoras ?? 3} onChange={e => setConfig({ ...config, demoraRespuestaHoras: e.target.value })} />
       </label>
       <div className={styles.actions}>
         {saved && <span className={styles.ok}>✓ Guardado</span>}
