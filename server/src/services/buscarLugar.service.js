@@ -22,7 +22,11 @@ export function parseUsig(json) {
   const lat = Number(d?.coordenadas?.y);
   const lng = Number(d?.coordenadas?.x);
   if (!dentroDeZona(lat, lng)) return null;
-  return { nombre: titulo(String(d.direccion).replace(/, CABA$/i, '')) + ', CABA', lat, lng };
+  // USIG también resuelve partidos del conurbano ("…, La Matanza"): sólo se
+  // normaliza el sufijo cuando es de CABA.
+  const dir = String(d.direccion);
+  const esCaba = /, CABA$/i.test(dir);
+  return { nombre: esCaba ? titulo(dir.replace(/, CABA$/i, '')) + ', CABA' : titulo(dir), lat, lng };
 }
 
 export function parseGeoref(json) {

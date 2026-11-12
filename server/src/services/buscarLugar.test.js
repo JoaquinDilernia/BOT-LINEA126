@@ -40,3 +40,8 @@ test('buscarLugar: usa el primer proveedor que encuentra y cachea', async () => 
 test('buscarLugar: texto muy corto → null', async () => {
   assert.equal(await buscarLugar('ab', []), null);
 });
+
+test('parseUsig: dirección del conurbano no se marca como CABA', () => {
+  const r = parseUsig({ direccionesNormalizadas: [{ direccion: 'AVENIDA INTENDENTE ESTEBAN CROVARA 4400, La Matanza', coordenadas: { x: '-58.54', y: '-34.699' } }] });
+  assert.equal(r.nombre, 'Avenida Intendente Esteban Crovara 4400, La Matanza');
+});
