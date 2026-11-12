@@ -74,7 +74,7 @@ Si el pasajero prefiere, también puede llamar al 0800-444-0273. Reclamos ante e
     title: 'Accesibilidad, mascotas y normas de viaje',
     order: 7,
     content: `Unidades accesibles: la flota incluye colectivos de piso bajo con rampa y espacio para silla de ruedas; los asientos de adelante son prioritarios para personas con discapacidad, embarazadas, personas mayores y con niños en brazos.
-Mascotas: se permiten mascotas pequeñas dentro de un transportador o bolso cerrado que el pasajero lleve en la falda; perros de asistencia siempre pueden viajar.
+Mascotas: por el momento no se permiten mascotas.
 Equipaje: sólo bultos que el pasajero pueda llevar sin molestar ni ocupar asientos; cochecitos de bebé plegados en horario pico.
 No se puede fumar, comer ni viajar en el estribo. Se sube por adelante y se baja por la puerta trasera tocando el timbre con anticipación.`,
   },

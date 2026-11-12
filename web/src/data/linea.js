@@ -160,7 +160,7 @@ export const FAQ = [
   { q: '¿Qué ramal me deja más cerca?', a: 'El A termina en La Tablada (Av. D. A. Maradona 4920) y el B en el Cementerio de Villegas (Pedro León Gallo y Peribebuy). En días hábiles, en hora pico, el C y el D son los expresos por autopista. Preguntale al asistente desde dónde y hasta dónde viajás.' },
   { q: '¿Los expresos paran en todas las paradas?', a: 'No en el tramo por autopista. Hacia provincia no se puede subir ni bajar entre Carlos Calvo (subida a la AU 25 de Mayo) y Pitágoras y Av. Alberdi; hacia Retiro, entre Av. Directorio y Dámaso Larrañaga y Bernardo de Irigoyen y Av. San Juan.' },
   { q: '¿Perdí algo en un colectivo, qué hago?', a: 'Registralo en el chat de atención con la descripción del objeto, el día, el horario y el ramal. Te damos un número para seguirlo y te avisamos si aparece. Los objetos se guardan en la terminal de La Tablada.' },
-  { q: '¿Puedo viajar con mi mascota?', a: 'Sí, si es pequeña y va dentro de un transportador o bolso cerrado. Los perros de asistencia pueden viajar siempre.' },
+  { q: '¿Puedo viajar con mi mascota?', a: 'Por el momento no se permiten mascotas a bordo. Los perros de asistencia (como los perros guía) pueden viajar siempre, como lo indica la ley.' },
   { q: '¿Quién tiene descuento?', a: 'La Tarifa Social Federal da 55% de descuento a jubilados, pensionados, AUH y otros beneficiarios. Las personas con Certificado Único de Discapacidad viajan sin cargo (y un acompañante, si el certificado lo indica) presentando el CUD original y vigente al chofer.' },
 ];
 
