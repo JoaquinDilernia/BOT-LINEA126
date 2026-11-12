@@ -100,7 +100,7 @@ export default function Tarifas() {
             <article className="card reveal">
               <IconAccessible className={s.bIcon} />
               <h3>Pase libre con CUD</h3>
-              <p>Las personas con Certificado Único de Discapacidad viajan sin cargo, y un acompañante si el certificado lo indica. Se presenta el CUD al chofer.</p>
+              <p>Las personas con Certificado Único de Discapacidad viajan sin cargo, y un acompañante si el certificado lo indica. Se presenta el <strong>CUD original y vigente</strong> al chofer.</p>
             </article>
             <article className="card reveal">
               <IconSwap className={s.bIcon} />

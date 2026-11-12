@@ -67,7 +67,7 @@ export default function Horarios() {
               <div className={s.tableHead}>
                 <div>
                   <h2>{datos.titulo}</h2>
-                  <p>Servicio de {datos.servicio} · {datos.servicios}</p>
+                  <p>Servicio {datos.servicio}{datos.servicios ? ` · ${datos.servicios}` : ''}</p>
                 </div>
                 <RamalBadge letra="A" />
               </div>

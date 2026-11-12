@@ -264,7 +264,7 @@ export default function Inicio() {
           </div>
 
           <div className={s.features}>
-            <div className="reveal"><IconMoon /><h3>Servicio nocturno</h3><p>En días hábiles el ramal A funciona toda la noche, desde las 00:45.</p></div>
+            <div className="reveal"><IconMoon /><h3>Servicio nocturno</h3><p>La 126 funciona las 24 horas, todos los días del año.</p></div>
             <div className="reveal"><IconAccessible /><h3>Unidades accesibles</h3><p>Pisos bajos, rampa y espacio reservado para sillas de ruedas.</p></div>
             <div className="reveal"><IconRoute /><h3>Conexión con todo</h3><p>Trenes Mitre, San Martín y Belgrano en Retiro, subtes y Metrobús en el centro.</p></div>
           </div>

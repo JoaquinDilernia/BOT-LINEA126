@@ -47,8 +47,8 @@ export default function Empresa() {
       <section className={s.numbers}>
         <div className={`container ${s.numbersGrid}`}>
           <div className="reveal"><IconRoute /><strong>27 km</strong><span>de Retiro a La Tablada</span></div>
-          <div className="reveal"><IconBus /><strong>6 ramales</strong><span>comunes, de días hábiles y expresos</span></div>
-          <div className="reveal"><IconClock /><strong>23 h</strong><span>de servicio cada día hábil</span></div>
+          <div className="reveal"><IconBus /><strong>4 ramales</strong><span>2 comunes y 2 expresos por autopista</span></div>
+          <div className="reveal"><IconClock /><strong>24 h</strong><span>de servicio, todos los días</span></div>
           <div className="reveal"><IconShield /><strong>Nacional</strong><span>permiso de la Secretaría de Transporte</span></div>
         </div>
       </section>

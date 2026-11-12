@@ -129,7 +129,7 @@ export default function Recorridos() {
           <div className="sectionHead reveal">
             <span className="kicker">Ramales</span>
             <h2>Todos los servicios de la línea</h2>
-            <p>El C y el D salen desde Caballito y el E y el F son expresos por autopista: comparten la mayor parte del trazado del A y el B.</p>
+            <p>El A y el B son los servicios comunes. El C y el D son expresos por autopista: hacen el trazado del A y el B, pero sin parar en el tramo de la AU 25 de Mayo.</p>
           </div>
           <div className={s.ramales}>
             {RAMALES.map((r) => (
@@ -146,9 +146,9 @@ export default function Recorridos() {
           </div>
 
           <div className={`reveal ${s.expreso}`}>
-            <RamalBadge letra="E" tipo="expreso" />
+            <RamalBadge letra="C" tipo="expreso" />
             <div>
-              <h3>Cómo funcionan los expresos (E y F)</h3>
+              <h3>Cómo funcionan los expresos (C y D)</h3>
               <p>Hacia provincia no se puede subir ni bajar entre Carlos Calvo (subida a la AU 25 de Mayo) y Pitágoras y Av. Alberdi. Hacia Retiro, entre Av. Directorio y Dámaso Larrañaga y Bernardo de Irigoyen y Av. San Juan. En el resto del recorrido paran como el servicio común.</p>
             </div>
           </div>

@@ -4,11 +4,12 @@ import PageHero from '../components/PageHero.jsx';
 import RamalBadge from '../components/RamalBadge.jsx';
 import { IconChat, IconClock, IconPin, IconSwap, IconCard, IconInfo, IconBus } from '../components/icons.jsx';
 import { useApi, usePageTitle } from '../lib/hooks.js';
+import { apiGet } from '../lib/api.js';
 import { useChat } from '../lib/chat.jsx';
 import { useSimClock } from '../lib/useSim.js';
 import { TOTAL_KM, duracionViaje, fmtHora, minutosHasta, proximosKm } from '../lib/sim.js';
 import { buscarParada, minutosCaminando, opcionesParadas, planificar, tarifaPlan } from '../lib/planner.js';
-import { peso } from '../data/linea.js';
+import { LUGARES, peso } from '../data/linea.js';
 import s from './ComoLlego.module.css';
 
 const simSentido = (sentido) => (sentido === 'ida' ? 'haciaTablada' : 'haciaRetiro');
@@ -36,6 +37,7 @@ export default function ComoLlego() {
   const [geoEstado, setGeoEstado] = useState('');
   const [consulta, setConsulta] = useState(null);
   const [error, setError] = useState('');
+  const [buscando, setBuscando] = useState(false);
 
   function usarUbicacion() {
     if (!navigator.geolocation) { setGeoEstado('Tu navegador no permite ubicarte.'); return; }
@@ -51,16 +53,40 @@ export default function ComoLlego() {
     );
   }
 
-  function buscar(e) {
+  // Parada de la lista → si no, calle/esquina/lugar vía backend (USIG,
+  // Georef, OSM). Lo que no es parada se trata como punto propio: el plan
+  // suma la caminata hasta la parada más cercana.
+  async function resolver(texto) {
+    const parada = buscarParada(opciones, texto);
+    if (parada) return parada;
+    const lugar = LUGARES.find((l) => l.nombre === texto.trim());
+    try {
+      const { lugar: r } = await apiGet(`/lugar?q=${encodeURIComponent(lugar?.buscar ?? texto)}`);
+      return { nombre: lugar?.nombre ?? r.nombre, latlng: [r.lat, r.lng], propia: true };
+    } catch {
+      return null;
+    }
+  }
+
+  async function buscar(e) {
     e?.preventDefault();
     setError('');
-    const origen = desdeTxt === 'Mi ubicación' && miUbicacion
-      ? { nombre: 'Tu ubicación', latlng: miUbicacion, propia: true }
-      : buscarParada(opciones, desdeTxt);
-    const destino = buscarParada(opciones, hastaTxt);
+    if (!desdeTxt.trim() || !hastaTxt.trim()) {
+      setError('Completá desde dónde salís y a dónde vas.');
+      return;
+    }
+    setBuscando(true);
+    const [origen, destino] = await Promise.all([
+      desdeTxt === 'Mi ubicación' && miUbicacion
+        ? { nombre: 'Tu ubicación', latlng: miUbicacion, propia: true }
+        : resolver(desdeTxt),
+      resolver(hastaTxt),
+    ]);
+    setBuscando(false);
     if (!origen || !destino) {
       setConsulta(null);
-      setError('Elegí origen y destino de la lista de paradas (o usá tu ubicación como origen).');
+      const cual = !origen && !destino ? 'el origen ni el destino' : !origen ? `"${desdeTxt}"` : `"${hastaTxt}"`;
+      setError(`No encontramos ${cual}. Probá con calle y altura (ej: Directorio 3000), una esquina (ej: Rivadavia y Medrano) o elegí una parada de la lista.`);
       return;
     }
     const plan = planificar(recorridos, origen.latlng, destino.latlng);
@@ -121,22 +147,23 @@ export default function ComoLlego() {
             <form className={`card ${s.form}`} onSubmit={buscar}>
               <datalist id="paradas">
                 {opciones.map((o) => <option key={o.nombre} value={o.nombre} />)}
+                {LUGARES.map((l) => <option key={l.nombre} value={l.nombre}>{l.barrio}</option>)}
               </datalist>
               <div className={s.inputs}>
                 <span className={s.rail} aria-hidden="true"><i /><b /><i /></span>
                 <div className="field">
                   <label htmlFor="desde">Desde</label>
-                  <input id="desde" list="paradas" value={desdeTxt} onChange={(e) => { setDesdeTxt(e.target.value); if (e.target.value !== 'Mi ubicación') setMiUbicacion(null); }} placeholder={loading ? 'Cargando paradas…' : 'Parada o calle'} autoComplete="off" />
+                  <input id="desde" list="paradas" value={desdeTxt} onChange={(e) => { setDesdeTxt(e.target.value); if (e.target.value !== 'Mi ubicación') setMiUbicacion(null); }} placeholder={loading ? 'Cargando paradas…' : 'Calle y altura, esquina o lugar'} autoComplete="off" />
                 </div>
                 <div className="field">
                   <label htmlFor="hasta">Hasta</label>
-                  <input id="hasta" list="paradas" value={hastaTxt} onChange={(e) => setHastaTxt(e.target.value)} placeholder="Parada o calle" autoComplete="off" />
+                  <input id="hasta" list="paradas" value={hastaTxt} onChange={(e) => setHastaTxt(e.target.value)} placeholder="Calle y altura, esquina o lugar" autoComplete="off" />
                 </div>
                 <button type="button" className={s.swap} onClick={invertir} aria-label="Invertir origen y destino"><IconSwap /></button>
               </div>
               <div className={s.actions}>
                 <button type="button" className={`btn btn--ghost btn--sm ${s.geo}`} onClick={usarUbicacion}><IconPin /> Usar mi ubicación</button>
-                <button type="submit" className="btn">Buscar viaje</button>
+                <button type="submit" className="btn" disabled={buscando}>{buscando ? 'Buscando…' : 'Buscar viaje'}</button>
               </div>
               {geoEstado && <p className={s.geoMsg}>{geoEstado}</p>}
             </form>

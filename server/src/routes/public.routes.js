@@ -6,6 +6,7 @@ import { getAllTarifas } from '../services/tarifa.service.js';
 import { getPublicReclamoByNumero } from '../services/ticket.service.js';
 import { createPostulacion } from '../services/postulacion.service.js';
 import { getNovedadesVigentes, toPublic } from '../services/novedad.service.js';
+import { buscarLugar } from '../services/buscarLugar.service.js';
 
 // Todo lo que consume el sitio institucional. Sin auth: sólo devuelve datos
 // públicos (nunca contactos, legajos ni notas internas).
@@ -115,6 +116,23 @@ router.get('/novedades', async (req, res) => {
     res.json({ novedades });
   } catch (err) {
     res.status(500).json({ error: 'No pudimos cargar las novedades.' });
+  }
+});
+
+// --- ¿Cómo llego?: calle, esquina o lugar → coordenadas ------------------------
+// Pega a servicios externos (USIG, Georef, Nominatim): 60 búsquedas / 10 min por IP.
+const lugarRateLimit = rateLimit({ windowMs: 10 * 60 * 1000, max: 60, message: 'Demasiadas búsquedas. Probá de nuevo en unos minutos.' });
+
+router.get('/lugar', lugarRateLimit, async (req, res) => {
+  try {
+    const texto = String(req.query.q ?? '').trim().slice(0, 120);
+    if (texto.length < 3) return res.status(400).json({ error: 'Escribí una calle, esquina o lugar.' });
+    const lugar = await buscarLugar(texto);
+    if (!lugar) return res.status(404).json({ error: 'No encontramos esa dirección en la zona de la 126.' });
+    res.json({ lugar });
+  } catch (err) {
+    console.error('[public] lugar:', err.message);
+    res.status(500).json({ error: 'No pudimos buscar la dirección.' });
   }
 });
 

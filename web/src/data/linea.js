@@ -12,44 +12,33 @@ export const EMPRESA = {
   coords: [-34.69627, -58.5462],
   telefono: '(011) 4482-1639',
   telefonoHref: 'tel:+541144821639',
-  horarioOficina: 'Lunes a viernes de 9 a 16 h',
+  horarioOficina: 'Lunes a viernes de 8 a 15 h',
   permiso: 'Permiso nacional Disp. SSTM y LD N° 51/97 · vigente hasta 26/01/2027',
 };
 
-// tipo: comun (todos los días) | habiles (franja de días hábiles) | expreso
+// tipo: comun (todos los días) | expreso. Nov/2026: se dieron de baja los
+// viejos C y D (Caballito); los expresos E y F pasaron a llamarse C y D.
 export const RAMALES = [
   {
     letra: 'A', tipo: 'comun', desde: 'Retiro', hasta: 'La Tablada',
     detalle: 'Av. D. A. Maradona 4920',
-    horario: 'Todos los días · nocturno en días hábiles',
+    horario: 'Todos los días, las 24 horas',
     via: 'Por Plaza de Mayo, San Telmo, Boedo, Caballito, Flores y Mataderos.',
   },
   {
     letra: 'B', tipo: 'comun', desde: 'Retiro', hasta: 'Cementerio de Villegas',
     detalle: 'Pedro León Gallo y Peribebuy',
-    horario: 'Todos los días',
+    horario: 'Todos los días, las 24 horas',
     via: 'Igual que el A hasta Av. Crovara; sigue por Centenera, José C. Paz y Ambrosetti.',
   },
   {
-    letra: 'C', tipo: 'habiles', desde: 'Directorio y J. M. Moreno', hasta: 'La Tablada',
-    detalle: 'Caballito ⇄ La Tablada',
-    horario: 'Días hábiles de 7:00 a 10:30',
-    via: 'Por Av. Directorio, Beauchef, Pedro Goyena y Alberdi.',
-  },
-  {
-    letra: 'D', tipo: 'habiles', desde: 'Directorio y J. M. Moreno', hasta: 'Cementerio de Villegas',
-    detalle: 'Caballito ⇄ Villegas',
-    horario: 'Días hábiles de 7:00 a 10:30',
-    via: 'Mismo trazado que el C, con final en el Cementerio de Villegas.',
-  },
-  {
-    letra: 'E', tipo: 'expreso', desde: 'Retiro', hasta: 'La Tablada',
+    letra: 'C', tipo: 'expreso', desde: 'Retiro', hasta: 'La Tablada',
     detalle: 'Expreso por AU 25 de Mayo',
     horario: 'Días hábiles · a Retiro 7:40–9:40 · a provincia 17:30–19:30',
     via: 'Sobre la traza del A, por Autopista 25 de Mayo y Perito Moreno.',
   },
   {
-    letra: 'F', tipo: 'expreso', desde: 'Retiro', hasta: 'Cementerio de Villegas',
+    letra: 'D', tipo: 'expreso', desde: 'Retiro', hasta: 'Cementerio de Villegas',
     detalle: 'Expreso por AU 25 de Mayo',
     horario: 'Días hábiles · a Retiro 7:00–9:00 · a provincia 17:00–19:00',
     via: 'Sobre la traza del B, por Autopista 25 de Mayo y Perito Moreno.',
@@ -64,48 +53,46 @@ export const TIPO_RAMAL = {
 
 export const CABECERAS = [
   { nombre: 'Retiro', detalle: 'Av. de los Inmigrantes entre Cabo P. T. Fels y Av. Antártida Argentina', combina: 'Trenes Mitre, San Martín y Belgrano Norte · Subte C · Terminal de ómnibus', coords: [-34.58626, -58.37049] },
-  { nombre: 'Caballito', detalle: 'Av. Directorio y Av. José María Moreno (ramales C y D)', combina: 'Parque Chacabuco', coords: [-34.62815, -58.43478] },
   { nombre: 'La Tablada', detalle: 'Av. D. A. Maradona 4920 · terminal y sede de la empresa', combina: 'Atención al pasajero y objetos perdidos', coords: [-34.69627, -58.5462] },
-  { nombre: 'Cementerio de Villegas', detalle: 'Pedro León Gallo y Peribebuy, Villegas', combina: 'Ramales B, D y F · estación Justo Villegas', coords: [-34.70136, -58.5639] },
+  { nombre: 'Cementerio de Villegas', detalle: 'Pedro León Gallo y Peribebuy, Villegas', combina: 'Ramales B y D · estación Justo Villegas', coords: [-34.70136, -58.5639] },
 ];
 
-// Diagramación Invierno 2026 del ramal A (intervalos programados).
+// Frecuencias que pasó la empresa (nov/2026). Servicio las 24 h todos los días.
+// La simulación del mapa (lib/sim.js) arma las salidas con estas franjas.
 export const FRECUENCIAS = {
   habil: {
     titulo: 'Días hábiles',
-    servicio: '00:45 a 23:55',
-    servicios: '158 a Retiro · 156 a La Tablada',
-    // Distinto por sentido: [hacia Retiro, hacia La Tablada]
+    servicio: 'las 24 horas',
     franjas: [
-      { horario: '00:45 – 03:55', cada: ['20 a 60 min', '20 a 60 min'], nota: 'Nocturno' },
-      { horario: '03:55 – 06:10', cada: ['10 a 15 min', '10 a 15 min'] },
-      { horario: '06:10 – 10:00', cada: ['9 a 10 min', '10 min'] },
-      { horario: '10:00 – 11:00', cada: ['6,5 min', '6 min'] },
-      { horario: '11:00 – 17:00', cada: ['6 min', '6 min'] },
-      { horario: '17:00 – 19:30', cada: ['6 min', '6,5 a 7 min'] },
-      { horario: '19:30 – 21:30', cada: ['10 min', '10 min'] },
-      { horario: '21:30 – 23:55', cada: ['15 a 20 min', '15 a 20 min'] },
+      { horario: '00:00 – 03:00', cada: 'cada 30 min', nota: 'Nocturno' },
+      { horario: '03:00 – 04:00', cada: 'cada 15 a 20 min' },
+      { horario: '04:00 – 05:00', cada: 'cada 8 min' },
+      { horario: '05:00 – 20:00', cada: 'cada 4 min' },
+      { horario: '20:00 – 21:00', cada: 'cada 5 min' },
+      { horario: '21:00 – 24:00', cada: 'cada 10 min' },
     ],
   },
   sabado: {
     titulo: 'Sábados',
-    servicio: '04:00 a 24:00',
-    servicios: '107 por sentido',
+    servicio: 'las 24 horas',
     franjas: [
-      { horario: '04:00 – 05:00', cada: 'cada 30 min' },
-      { horario: '05:00 – 06:00', cada: 'cada 15 min' },
-      { horario: '06:00 – 19:00', cada: 'cada 10 min' },
-      { horario: '19:00 – 24:00', cada: 'cada 15 min' },
+      { horario: '00:00 – 03:00', cada: 'cada 30 min', nota: 'Nocturno' },
+      { horario: '03:00 – 04:00', cada: 'cada 20 min' },
+      { horario: '04:00 – 06:00', cada: 'cada 12 min' },
+      { horario: '06:00 – 20:00', cada: 'cada 6 min' },
+      { horario: '20:00 – 23:00', cada: 'cada 8 min' },
+      { horario: '23:00 – 24:00', cada: 'cada 10 min' },
     ],
   },
   domingo: {
     titulo: 'Domingos y feriados',
-    servicio: '06:00 a 24:00',
-    servicios: '86 por sentido',
+    servicio: 'las 24 horas',
     franjas: [
-      { horario: '06:00 – 08:00', cada: 'cada 15 min' },
-      { horario: '08:00 – 20:00', cada: 'cada 12 min' },
-      { horario: '20:00 – 24:00', cada: 'cada 15 min' },
+      { horario: '00:00 – 03:00', cada: 'cada 30 min', nota: 'Nocturno' },
+      { horario: '03:00 – 04:00', cada: 'cada 20 min' },
+      { horario: '04:00 – 06:00', cada: 'cada 15 min' },
+      { horario: '06:00 – 20:00', cada: 'cada 8 min' },
+      { horario: '20:00 – 24:00', cada: 'cada 10 min' },
     ],
   },
 };
@@ -141,38 +128,40 @@ export const peso = (n) =>
   `$${Number(n).toLocaleString('es-AR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
 // Lugares a los que acerca, del listado oficial de paradas (columna "Cercanía").
+// `buscar`: dirección para ubicarlo en "¿Cómo llego?" cuando el nombre es
+// ambiguo (ej. hay otra Facultad de Ingeniería en Recoleta).
 export const LUGARES = [
-  { nombre: 'Estación Retiro y terminal de ómnibus', tipo: 'Transporte', barrio: 'Retiro' },
-  { nombre: 'Palacio Libertad y Luna Park', tipo: 'Cultura', barrio: 'San Nicolás' },
-  { nombre: 'Plaza de Mayo y Cabildo', tipo: 'Historia', barrio: 'Monserrat' },
-  { nombre: 'Manzana de las Luces', tipo: 'Historia', barrio: 'Monserrat' },
-  { nombre: 'Feria de San Telmo', tipo: 'Paseo', barrio: 'San Telmo' },
-  { nombre: 'Facultad de Ingeniería (UBA) y UCA', tipo: 'Educación', barrio: 'Monserrat' },
-  { nombre: 'UADE', tipo: 'Educación', barrio: 'Monserrat' },
-  { nombre: 'Facultad de Ciencias Sociales (UBA)', tipo: 'Educación', barrio: 'Constitución' },
-  { nombre: 'Hospital Santa Lucía', tipo: 'Salud', barrio: 'San Cristóbal' },
-  { nombre: 'Hospital Milstein', tipo: 'Salud', barrio: 'San Cristóbal' },
-  { nombre: 'Hospital del Quemado', tipo: 'Salud', barrio: 'Caballito' },
-  { nombre: 'Facultad de Filosofía y Letras (UBA)', tipo: 'Educación', barrio: 'Parque Chacabuco' },
+  { nombre: 'Estación Retiro y terminal de ómnibus', buscar: 'Ramos Mejia 1430', tipo: 'Transporte', barrio: 'Retiro' },
+  { nombre: 'Palacio Libertad y Luna Park', buscar: 'Sarmiento 151', tipo: 'Cultura', barrio: 'San Nicolás' },
+  { nombre: 'Plaza de Mayo y Cabildo', buscar: 'Plaza de Mayo', tipo: 'Historia', barrio: 'Monserrat' },
+  { nombre: 'Manzana de las Luces', buscar: 'Peru 272', tipo: 'Historia', barrio: 'Monserrat' },
+  { nombre: 'Feria de San Telmo', buscar: 'Defensa y Humberto Primo', tipo: 'Paseo', barrio: 'San Telmo' },
+  { nombre: 'Facultad de Ingeniería (UBA) y UCA', buscar: 'Paseo Colon 850', tipo: 'Educación', barrio: 'Monserrat' },
+  { nombre: 'UADE', buscar: 'Lima 717', tipo: 'Educación', barrio: 'Monserrat' },
+  { nombre: 'Facultad de Ciencias Sociales (UBA)', buscar: 'Santiago del Estero 1029', tipo: 'Educación', barrio: 'Constitución' },
+  { nombre: 'Hospital Santa Lucía', buscar: 'Av. San Juan 2021', tipo: 'Salud', barrio: 'San Cristóbal' },
+  { nombre: 'Hospital Milstein', buscar: 'La Rioja 951', tipo: 'Salud', barrio: 'San Cristóbal' },
+  { nombre: 'Hospital del Quemado', buscar: 'Pedro Goyena 369', tipo: 'Salud', barrio: 'Caballito' },
+  { nombre: 'Facultad de Filosofía y Letras (UBA)', buscar: 'Puan 480', tipo: 'Educación', barrio: 'Parque Chacabuco' },
   { nombre: 'Parque Chacabuco', tipo: 'Parque', barrio: 'Parque Chacabuco' },
-  { nombre: 'UFLO', tipo: 'Educación', barrio: 'Flores' },
+  { nombre: 'UFLO', buscar: 'Pedernera 275', tipo: 'Educación', barrio: 'Flores' },
   { nombre: 'Parque Avellaneda', tipo: 'Parque', barrio: 'Parque Avellaneda' },
-  { nombre: 'Feria de Mataderos', tipo: 'Paseo', barrio: 'Mataderos' },
+  { nombre: 'Feria de Mataderos', buscar: 'Lisandro de la Torre y De los Corrales', tipo: 'Paseo', barrio: 'Mataderos' },
   { nombre: 'Estadio de Nueva Chicago', tipo: 'Deporte', barrio: 'Mataderos' },
-  { nombre: 'Estación La Tablada', tipo: 'Transporte', barrio: 'La Tablada' },
-  { nombre: 'Estación Justo Villegas', tipo: 'Transporte', barrio: 'Villegas' },
+  { nombre: 'Estación La Tablada', buscar: 'La Tablada railway station', tipo: 'Transporte', barrio: 'La Tablada' },
+  { nombre: 'Estación Justo Villegas', buscar: 'Ambrosetti y Pedro Leon Gallo', tipo: 'Transporte', barrio: 'Villegas' },
 ];
 
 export const BARRIOS = ['Retiro', 'San Nicolás', 'Monserrat', 'San Telmo', 'Constitución', 'San Cristóbal', 'Boedo', 'Caballito', 'Parque Chacabuco', 'Flores', 'Parque Avellaneda', 'Mataderos', 'Villa Madero', 'La Tablada', 'Villegas'];
 
 export const FAQ = [
   { q: '¿Cómo pago el boleto?', a: 'Sólo con tarjeta SUBE. Al subir decile al chofer hasta dónde viajás y apoyá la tarjeta. Registrala a tu nombre: sin registrar el boleto sale el doble.' },
-  { q: '¿El colectivo funciona de noche?', a: 'Sí. En días hábiles el ramal A tiene servicio nocturno desde las 00:45, con frecuencias de 20 a 60 minutos de madrugada. Sábados arranca a las 4 y domingos a las 6.' },
-  { q: '¿Qué ramal me deja más cerca?', a: 'El A termina en La Tablada (Av. D. A. Maradona 4920) y el B en el Cementerio de Villegas (Pedro León Gallo y Peribebuy). En días hábiles a la mañana, el C y el D salen desde Caballito. Preguntale al asistente desde dónde y hasta dónde viajás.' },
+  { q: '¿El colectivo funciona de noche?', a: 'Sí. La 126 funciona las 24 horas, todos los días. De 0 a 3 h pasa cada 30 minutos.' },
+  { q: '¿Qué ramal me deja más cerca?', a: 'El A termina en La Tablada (Av. D. A. Maradona 4920) y el B en el Cementerio de Villegas (Pedro León Gallo y Peribebuy). En días hábiles, en hora pico, el C y el D son los expresos por autopista. Preguntale al asistente desde dónde y hasta dónde viajás.' },
   { q: '¿Los expresos paran en todas las paradas?', a: 'No en el tramo por autopista. Hacia provincia no se puede subir ni bajar entre Carlos Calvo (subida a la AU 25 de Mayo) y Pitágoras y Av. Alberdi; hacia Retiro, entre Av. Directorio y Dámaso Larrañaga y Bernardo de Irigoyen y Av. San Juan.' },
   { q: '¿Perdí algo en un colectivo, qué hago?', a: 'Registralo en el chat de atención con la descripción del objeto, el día, el horario y el ramal. Te damos un número para seguirlo y te avisamos si aparece. Los objetos se guardan en la terminal de La Tablada.' },
   { q: '¿Puedo viajar con mi mascota?', a: 'Sí, si es pequeña y va dentro de un transportador o bolso cerrado. Los perros de asistencia pueden viajar siempre.' },
-  { q: '¿Quién tiene descuento?', a: 'La Tarifa Social Federal da 55% de descuento a jubilados, pensionados, AUH y otros beneficiarios. Las personas con Certificado Único de Discapacidad viajan sin cargo.' },
+  { q: '¿Quién tiene descuento?', a: 'La Tarifa Social Federal da 55% de descuento a jubilados, pensionados, AUH y otros beneficiarios. Las personas con Certificado Único de Discapacidad viajan sin cargo (y un acompañante, si el certificado lo indica) presentando el CUD original y vigente al chofer.' },
 ];
 
 export const CATEGORIAS_RECLAMO = [

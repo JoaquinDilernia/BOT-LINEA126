@@ -14,14 +14,15 @@ describe('parseCada', () => {
 describe('salidas', () => {
   it('genera una cantidad de servicios cercana a la diagramación oficial', () => {
     // Oficial: 158 a Retiro y 156 a La Tablada en día hábil; 107 por sentido el sábado.
-    expect(salidas('habil', 'haciaRetiro').length).toBeGreaterThan(140);
-    expect(salidas('habil', 'haciaRetiro').length).toBeLessThan(175);
-    expect(salidas('sabado', 'haciaTablada').length).toBeGreaterThan(95);
-    expect(salidas('sabado', 'haciaTablada').length).toBeLessThan(120);
+    // Frecuencias nov/2026: cada 4 min de 5 a 20 en hábiles, 24 h.
+    expect(salidas('habil', 'haciaRetiro').length).toBeGreaterThan(250);
+    expect(salidas('habil', 'haciaRetiro').length).toBeLessThan(300);
+    expect(salidas('sabado', 'haciaTablada').length).toBeGreaterThan(175);
+    expect(salidas('sabado', 'haciaTablada').length).toBeLessThan(225);
   });
-  it('arranca a la hora de inicio del servicio', () => {
-    expect(salidas('habil', 'haciaRetiro')[0]).toBe(45);
-    expect(salidas('domingo', 'haciaRetiro')[0]).toBe(360);
+  it('servicio las 24 h: arranca a medianoche todos los días', () => {
+    expect(salidas('habil', 'haciaRetiro')[0]).toBe(0);
+    expect(salidas('domingo', 'haciaRetiro')[0]).toBe(0);
   });
 });
 
@@ -44,10 +45,10 @@ describe('viaje', () => {
 });
 
 describe('flota', () => {
-  it('a las 12 de un día hábil hay unos 25-30 colectivos andando', () => {
+  it('a las 12 de un día hábil hay unos 40 colectivos andando (cada 4 min)', () => {
     const n = busesEn(12 * 60, 'habil', 'habil').length;
-    expect(n).toBeGreaterThan(20);
-    expect(n).toBeLessThan(35);
+    expect(n).toBeGreaterThan(35);
+    expect(n).toBeLessThan(50);
   });
   it('a las 3 de la mañana hay pocos (servicio nocturno)', () => {
     const n = busesEn(3 * 60, 'habil', 'habil').length;
