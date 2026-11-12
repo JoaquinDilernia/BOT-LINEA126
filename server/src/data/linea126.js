@@ -43,7 +43,7 @@ export const RECORRIDOS_126 = [
   {
     nombre: 'Ramal A — La Tablada ⇄ Retiro',
     lineaNombre: 'Línea 126',
-    descripcion: 'Servicio común, todos los días. Terminal La Tablada (Av. D. A. Maradona 4920) ⇄ Retiro (Av. de los Inmigrantes). Hacia Retiro va por Av. Crovara, Av. Eva Perón, Guaminí, Av. Cárdenas, Av. de los Corrales, Lisandro de la Torre, Av. Directorio, Av. San Juan, Paseo Colón, Av. Belgrano, Av. Julio A. Roca, Hipólito Yrigoyen y el Metrobús del Bajo (L. N. Alem). Hacia La Tablada vuelve por L. N. Alem, Av. Rivadavia, Av. Julio A. Roca, Av. Belgrano, Paseo Colón, Av. Independencia, Lima, Humberto 1º, Carlos Calvo, Av. Pedro Goyena, Av. Juan B. Alberdi, Av. Bruix, Av. Directorio, Av. Cárdenas, Av. Eva Perón y Av. Crovara.',
+    descripcion: 'Servicio común, todos los días, las 24 horas. En días hábiles, en hora pico, el expreso C hace esta misma traza por Autopista 25 de Mayo y Perito Moreno (hacia Retiro 7:40 a 9:40, hacia La Tablada 17:30 a 19:30), sin subir ni bajar pasajeros en el tramo por autopista. Terminal La Tablada (Av. D. A. Maradona 4920) ⇄ Retiro (Av. de los Inmigrantes). Hacia Retiro va por Av. Crovara, Av. Eva Perón, Guaminí, Av. Cárdenas, Av. de los Corrales, Lisandro de la Torre, Av. Directorio, Av. San Juan, Paseo Colón, Av. Belgrano, Av. Julio A. Roca, Hipólito Yrigoyen y el Metrobús del Bajo (L. N. Alem). Hacia La Tablada vuelve por L. N. Alem, Av. Rivadavia, Av. Julio A. Roca, Av. Belgrano, Paseo Colón, Av. Independencia, Lima, Humberto 1º, Carlos Calvo, Av. Pedro Goyena, Av. Juan B. Alberdi, Av. Bruix, Av. Directorio, Av. Cárdenas, Av. Eva Perón y Av. Crovara.',
     activo: true,
     order: 1,
     secciones: SECCIONES_126,
@@ -53,7 +53,7 @@ export const RECORRIDOS_126 = [
   {
     nombre: 'Ramal B — Cementerio de Villegas ⇄ Retiro',
     lineaNombre: 'Línea 126',
-    descripcion: 'Servicio común, todos los días. Sale del Cementerio de Villegas (Pedro León Gallo y Peribebuy) por Ambrosetti, José C. Paz, Centenera y Av. Crovara, y desde Av. Crovara y La Quila hace el mismo recorrido que el ramal A hasta Retiro. A la vuelta, desde Av. Crovara sigue por Centenera, José C. Paz y Ambrosetti hasta Peribebuy (Cementerio de Villegas).',
+    descripcion: 'Servicio común, todos los días, las 24 horas. En días hábiles, en hora pico, el expreso D hace esta misma traza por Autopista 25 de Mayo y Perito Moreno (hacia Retiro 7:00 a 9:00, hacia Villegas 17:00 a 19:00), sin subir ni bajar pasajeros en el tramo por autopista. Sale del Cementerio de Villegas (Pedro León Gallo y Peribebuy) por Ambrosetti, José C. Paz, Centenera y Av. Crovara, y desde Av. Crovara y La Quila hace el mismo recorrido que el ramal A hasta Retiro. A la vuelta, desde Av. Crovara sigue por Centenera, José C. Paz y Ambrosetti hasta Peribebuy (Cementerio de Villegas).',
     activo: true,
     order: 2,
     secciones: SECCIONES_126,

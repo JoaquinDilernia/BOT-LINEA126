@@ -15,11 +15,11 @@ const CHANNEL_CONFIG = {
   web:       { label: 'Chat web',  cls: 'web' },
 };
 
+// Graves = conversaciones con un reclamo grave todavía sin resolver.
 const FILTERS = [
-  { value: 'waiting',       label: 'Esperando' },
   { value: 'bot',           label: 'Bot' },
+  { value: 'graves',        label: 'Graves' },
   { value: 'mine',          label: 'Mis casos' },
-  { value: 'teams',         label: 'Equipos',  minRole: 'atencion_cliente' },
   { value: 'archived',      label: 'Archivados' },
 ];
 
@@ -701,6 +701,7 @@ export default function Conversations() {
   const [searching, setSearching] = useState(false);
   const [archivedConversations, setArchivedConversations] = useState(null); // null = no cargado todavía
   const [loadingArchived, setLoadingArchived] = useState(false);
+  const [gravesIds, setGravesIds] = useState(null); // null = no cargado; Set de contactIds con reclamo grave abierto
   const [reply, setReply] = useState('');
   const [sending, setSending] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null); // { waMsgId, role, preview } | null
@@ -841,6 +842,7 @@ export default function Conversations() {
 
   useEffect(() => {
     if (filter === 'archived') loadArchivedConversations();
+    if (filter === 'graves') { loadGraves(); loadArchivedConversations(); }
   }, [filter]);
 
   useEffect(() => {
@@ -1078,6 +1080,17 @@ export default function Conversations() {
       });
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadGraves() {
+    try {
+      const res = await authFetch(BASE_URL + '/api/reclamos?gravedad=grave');
+      const data = res.ok ? await res.json() : { tickets: [] };
+      const abiertos = (data.tickets ?? []).filter(t => t.estado !== 'resuelto' && t.estado !== 'cerrado');
+      setGravesIds(new Set(abiertos.map(t => t.conversationId || t.contactId).filter(Boolean)));
+    } catch {
+      setGravesIds(new Set());
     }
   }
 
@@ -1521,6 +1534,9 @@ export default function Conversations() {
 
   const filtered = searchResults !== null
     ? searchResults
+    : filter === 'graves'
+      ? [...conversations, ...(archivedConversations ?? []).filter(a => !conversations.some(c => c.id === a.id))]
+          .filter(c => gravesIds?.has(c.id) && (!labelFilter || (c.labels ?? []).includes(labelFilter)))
     : filter === 'archived'
       ? (archivedConversations ?? []).filter(c => !labelFilter || (c.labels ?? []).includes(labelFilter))
       : conversations.filter(c => {
@@ -1637,7 +1653,7 @@ export default function Conversations() {
             <p className={styles.empty}>Cargando...</p>
           ) : searching ? (
             <p className={styles.empty}>Buscando...</p>
-          ) : (filter === 'archived' && loadingArchived) ? (
+          ) : ((filter === 'archived' || filter === 'graves') && (loadingArchived || (filter === 'graves' && gravesIds === null))) ? (
             <p className={styles.empty}>Cargando archivados...</p>
           ) : filtered.length === 0 ? (
             <p className={styles.empty}>Sin resultados.</p>
