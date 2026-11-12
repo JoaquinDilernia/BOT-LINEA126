@@ -136,9 +136,9 @@ export default function Inicio() {
       <section className={s.stats}>
         <div className={`container ${s.statsGrid}`}>
           <Stat valor={27} sufijo="km" texto="de recorrido de punta a punta" />
-          <Stat valor={6} texto="ramales, comunes y expresos" />
-          <Stat valor={314} texto="servicios cada día hábil" />
-          <Stat valor={6} sufijo="min" texto="de frecuencia en hora pico" />
+          <Stat valor={4} texto="ramales, comunes y expresos" />
+          <Stat valor={24} sufijo="h" texto="de servicio, todos los días" />
+          <Stat valor={4} sufijo="min" texto="de frecuencia en días hábiles" />
         </div>
       </section>
 
@@ -149,8 +149,8 @@ export default function Inicio() {
       <section className="section">
         <div className={`container ${s.historia}`}>
           <figure className={`reveal ${s.historiaFoto}`}>
-            <img src={FOTOS.clasico.src} width={FOTOS.clasico.w} height={FOTOS.clasico.h} alt={FOTOS.clasico.alt} loading="lazy" />
-            <figcaption>{FOTOS.clasico.pie}</figcaption>
+            <img src={FOTOS.historica.src} width={FOTOS.historica.w} height={FOTOS.historica.h} alt={FOTOS.historica.alt} loading="lazy" />
+            <figcaption>{FOTOS.historica.pie}</figcaption>
           </figure>
           <div className="reveal">
             <span className="kicker">Nuestra historia</span>

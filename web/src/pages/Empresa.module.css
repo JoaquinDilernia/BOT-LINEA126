@@ -1,5 +1,8 @@
 .intro { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(28px, 5vw, 64px); align-items: center; }
 .intro p { margin-top: 14px; color: var(--ink-3); font-size: 17.5px; }
+.antesAhora { display: grid; gap: 18px; }
+.antesAhora .foto:last-child img { aspect-ratio: 4 / 3; object-position: center 55%; }
+.antesAhora .foto figcaption { margin-top: 8px; }
 .h2 { margin: 12px 0 6px; font-family: var(--font-display); font-weight: 700; text-transform: uppercase; font-size: clamp(32px, 4.2vw, 48px); line-height: 1; }
 /* Fotos reales */
 .foto { margin: 0; }

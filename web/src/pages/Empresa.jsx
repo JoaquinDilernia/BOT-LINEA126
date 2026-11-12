@@ -38,8 +38,9 @@ export default function Empresa() {
             <h2 className={s.h2}>Una línea con raíces en La Tablada</h2>
             {HISTORIA.map((p) => <p key={p.slice(0, 24)}>{p}</p>)}
           </div>
-          <div className="reveal">
-            <Foto foto={FOTOS.clasico} />
+          <div className={`reveal ${s.antesAhora}`}>
+            <Foto foto={FOTOS.historica} />
+            <Foto foto={FOTOS.actual} />
           </div>
         </div>
       </section>

@@ -179,6 +179,10 @@ export const CATEGORIAS_RECLAMO = [
 // Fotos reales de la flota (las pasó la línea, oct/2026). Viven en
 // public/fotos y se sirven con rutas relativas (el sitio usa HashRouter).
 export const FOTOS = {
+  // Nov/2026: la empresa pidió sacar la del auxilio (clasico) y mostrar una
+  // antigua y una actual.
+  historica: { src: 'fotos/historica-126.jpg', w: 1200, h: 622, alt: 'Colectivo antiguo de la 126 en blanco y negro, con el cartel Tablada, Villegas, Plaza de Mayo', pie: 'Los comienzos: Tablada · Villegas · Plaza de Mayo.' },
+  actual: { src: 'fotos/interno-54.jpg', w: 1200, h: 1101, alt: 'Interno 54 de la Línea 126, Mercedes-Benz rojo, blanco y negro de Cárdenas S.A., accesible', pie: 'Hoy: el interno 54, accesible y con el recorrido Villegas · Tablada · Plaza de Mayo · Retiro.' },
   clasico: { src: 'fotos/clasico-126.jpg', w: 750, h: 562, alt: 'Colectivo clásico Mercedes-Benz de la 126, rojo con fileteado, restaurado como unidad de auxilio', pie: 'El clásico de la casa: restaurado en nuestro taller, hoy sale como unidad de auxilio.' },
   unidad: { src: 'fotos/unidad-31.jpg', w: 1080, h: 1080, alt: 'Interno 31 de la Línea 126 en la terminal, rojo y blanco con detalles fileteados', pie: 'Interno 31 en la terminal de La Tablada, con el fileteado de la línea.' },
   frente: { src: 'fotos/frente-126.jpg', w: 447, h: 447, alt: 'Frente de un colectivo de la 126 con el cartel Plaza de Mayo, Retiro y Villegas', pie: 'Listo para salir: Plaza de Mayo, Retiro y Villegas.' },
