@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import PageHero from '../components/PageHero.jsx';
 import { IconBriefcase, IconBus, IconCheck, IconShield } from '../components/icons.jsx';
-import { apiPost } from '../lib/api.js';
+import { apiPostForm } from '../lib/api.js';
 import { usePageTitle, useReveal } from '../lib/hooks.js';
 import s from './Trabaja.module.css';
 
@@ -11,22 +11,39 @@ const PUESTOS = [
   { id: 'Administración', icon: IconBriefcase, text: 'Atención al pasajero, recursos humanos, tráfico y tareas administrativas en la sede de La Tablada.' },
 ];
 
-const VACIO = { nombre: '', email: '', telefono: '', puesto: 'Chofer', licencia: '', zona: '', mensaje: '', cvUrl: '' };
+const VACIO = { nombre: '', email: '', telefono: '', puesto: 'Chofer', licencia: '', zona: '', mensaje: '' };
+const CV_MAX_MB = 5;
 
 export default function Trabaja() {
   usePageTitle('Trabajá con nosotros');
   useReveal();
   const [form, setForm] = useState(VACIO);
   const [estado, setEstado] = useState({ sending: false, ok: false, error: '' });
+  const [cv, setCv] = useState(null);
+  const [cvKey, setCvKey] = useState(0); // para vaciar el <input type="file">
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  function elegirCv(e) {
+    const file = e.target.files?.[0] ?? null;
+    let error = '';
+    if (file && file.type !== 'application/pdf' && !/\.pdf$/i.test(file.name)) error = 'El CV tiene que ser un archivo PDF.';
+    else if (file && file.size > CV_MAX_MB * 1024 * 1024) error = `El CV no puede pesar más de ${CV_MAX_MB} MB.`;
+    if (error) { setCv(null); setCvKey((k) => k + 1); } else setCv(file);
+    setEstado((s) => ({ ...s, error }));
+  }
 
   async function enviar(e) {
     e.preventDefault();
     setEstado({ sending: true, ok: false, error: '' });
     try {
-      await apiPost('/postulaciones', form);
+      const fd = new FormData();
+      Object.entries(form).forEach(([k, v]) => fd.append(k, v));
+      if (cv) fd.append('cv', cv);
+      await apiPostForm('/postulaciones', fd);
       setEstado({ sending: false, ok: true, error: '' });
       setForm(VACIO);
+      setCv(null);
+      setCvKey((k) => k + 1);
     } catch (err) {
       setEstado({ sending: false, ok: false, error: err.message });
     }
@@ -97,7 +114,7 @@ export default function Trabaja() {
                   )}
                   <div className="field"><label htmlFor="zona">Zona donde vivís</label><input id="zona" value={form.zona} onChange={set('zona')} placeholder="Ej: San Justo" /></div>
                 </div>
-                <div className="field"><label htmlFor="cvUrl">Link a tu CV</label><input id="cvUrl" type="url" value={form.cvUrl} onChange={set('cvUrl')} placeholder="https://drive.google.com/…" /><small>Opcional. Subilo a Google Drive o similar y pegá el link con acceso público.</small></div>
+                <div className="field"><label htmlFor="cv">Tu CV en PDF</label><input key={cvKey} id="cv" type="file" accept="application/pdf,.pdf" onChange={elegirCv} /><small>Opcional. Sólo PDF, hasta {CV_MAX_MB} MB.</small></div>
                 <div className="field"><label htmlFor="mensaje">Contanos sobre tu experiencia</label><textarea id="mensaje" value={form.mensaje} onChange={set('mensaje')} maxLength={2000} /></div>
                 {estado.error && <p className={s.error} role="alert">{estado.error}</p>}
                 <button type="submit" className="btn" disabled={estado.sending}>{estado.sending ? 'Enviando…' : 'Enviar postulación'}</button>

@@ -86,7 +86,12 @@ export default function Postulaciones() {
               <p className={styles.contact}>
                 <a href={`mailto:${p.email}`}>{p.email}</a>
                 <a href={`tel:${p.telefono}`}>{p.telefono}</a>
-                {p.cvUrl && <a href={p.cvUrl} target="_blank" rel="noopener noreferrer">Ver CV ↗</a>}
+                {p.cv?.chunks > 0 && (
+                  <a href={`${BASE_URL}/api/postulaciones/${p.id}/cv?token=${encodeURIComponent(localStorage.getItem('linea126_token') ?? '')}`} target="_blank" rel="noopener noreferrer">
+                    Ver CV (PDF) ↗
+                  </a>
+                )}
+                {!p.cv && p.cvUrl && <a href={p.cvUrl} target="_blank" rel="noopener noreferrer">Ver CV ↗</a>}
               </p>
               {p.mensaje && <p className={styles.msg}>{p.mensaje}</p>}
             </li>

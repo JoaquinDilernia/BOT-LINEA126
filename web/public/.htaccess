@@ -1,0 +1,5 @@
+# config.js y sw.js tienen que leerse siempre frescos: si quedan en caché, un
+# cambio de API_URL tarda hasta 7 días en llegar a quienes ya visitaron el sitio.
+<FilesMatch "^(config\.js|sw\.js)$">
+  Header set Cache-Control "no-cache, must-revalidate"
+</FilesMatch>

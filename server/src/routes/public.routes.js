@@ -4,7 +4,8 @@ import { getConversationHistory } from '../services/conversation.service.js';
 import { getAllRecorridos } from '../services/recorrido.service.js';
 import { getAllTarifas } from '../services/tarifa.service.js';
 import { getPublicReclamoByNumero } from '../services/ticket.service.js';
-import { createPostulacion } from '../services/postulacion.service.js';
+import multer from 'multer';
+import { createPostulacion, CV_MAX_BYTES } from '../services/postulacion.service.js';
 import { getNovedadesVigentes, toPublic } from '../services/novedad.service.js';
 import { buscarLugar } from '../services/buscarLugar.service.js';
 
@@ -156,9 +157,19 @@ router.get('/reclamos/:numero', reclamoRateLimit, async (req, res) => {
 // --- Trabajá con nosotros -----------------------------------------------------
 const formRateLimit = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: 'Ya recibimos varias postulaciones desde esta conexión. Probá más tarde.' });
 
-router.post('/postulaciones', formRateLimit, async (req, res) => {
+// multipart/form-data con el CV en el campo "cv" (PDF, hasta 5 MB). También
+// acepta JSON sin archivo, como antes.
+const cvUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: CV_MAX_BYTES, files: 1 } }).single('cv');
+
+router.post('/postulaciones', formRateLimit, (req, res, next) => {
+  cvUpload(req, res, (err) => {
+    if (err?.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'El CV no puede pesar más de 5 MB.' });
+    if (err) return res.status(400).json({ error: 'No pudimos leer el archivo del CV.' });
+    next();
+  });
+}, async (req, res) => {
   try {
-    const { id } = await createPostulacion(req.body ?? {});
+    const { id } = await createPostulacion(req.body ?? {}, req.file ?? null);
     res.status(201).json({ ok: true, id });
   } catch (err) {
     res.status(err.status ?? 500).json({ error: err.status ? err.message : 'No pudimos enviar la postulación.' });

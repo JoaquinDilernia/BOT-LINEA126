@@ -31,10 +31,46 @@ export function validarPostulacion(body) {
   return data;
 }
 
-export async function createPostulacion(body) {
+// CV en PDF: Railway no tiene disco persistente y el proyecto no usa
+// Storage, así que el archivo se guarda en Firestore partido en trozos
+// (un doc no puede pasar de 1 MiB) en la subcolección cv/ de la postulación.
+export const CV_MAX_BYTES = 5 * 1024 * 1024;
+const CV_CHUNK_BYTES = 900 * 1024;
+
+export function validarCv(file) {
+  if (!file) return null;
+  if (file.size > CV_MAX_BYTES) throw invalid('El CV no puede pesar más de 5 MB.');
+  // Se chequea el contenido, no sólo la extensión/mimetype que manda el navegador.
+  if (file.buffer.subarray(0, 5).toString('latin1') !== '%PDF-') throw invalid('El CV tiene que ser un archivo PDF.');
+  const nombre = clean(file.originalname, 120).replace(/[^\w.\- áéíóúñÁÉÍÓÚÑ]/g, '_') || 'cv.pdf';
+  return { nombre: /\.pdf$/i.test(nombre) ? nombre : nombre + '.pdf', size: file.size };
+}
+
+export async function createPostulacion(body, file = null) {
   const data = validarPostulacion(body);
-  const ref = await getDb().collection(COLLECTION).add({ ...data, estado: 'nueva', createdAt: new Date() });
+  const cv = validarCv(file);
+  const db = getDb();
+  const ref = db.collection(COLLECTION).doc();
+  const batch = db.batch();
+  if (cv) {
+    cv.chunks = Math.ceil(file.size / CV_CHUNK_BYTES);
+    for (let i = 0; i < cv.chunks; i++) {
+      batch.set(ref.collection('cv').doc(String(i)), { data: file.buffer.subarray(i * CV_CHUNK_BYTES, (i + 1) * CV_CHUNK_BYTES) });
+    }
+  }
+  batch.set(ref, { ...data, cv, estado: 'nueva', createdAt: new Date() });
+  await batch.commit();
   return { id: ref.id };
+}
+
+export async function getPostulacionCv(id) {
+  const ref = getDb().collection(COLLECTION).doc(id);
+  const doc = await ref.get();
+  const cv = doc.exists ? doc.data().cv : null;
+  if (!cv?.chunks) return null;
+  const snap = await ref.collection('cv').get();
+  const parts = snap.docs.sort((a, b) => Number(a.id) - Number(b.id)).map(d => Buffer.from(d.data().data));
+  return { nombre: cv.nombre, buffer: Buffer.concat(parts) };
 }
 
 export async function listPostulaciones() {
