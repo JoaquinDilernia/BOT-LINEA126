@@ -18,6 +18,10 @@ export const mailEnabled = () => !!process.env.RESEND_API_KEY && !!process.env.M
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// Tildes, ñ, °, —: como entidades numéricas, así el HTML se ve bien aunque el
+// cliente de correo ignore el charset (pasaba: "LÃ­nea 126").
+const toAscii = (s) => s.replace(/[^\x00-\x7f]/gu, c => `&#${c.codePointAt(0)};`);
+
 // El texto de la plantilla usa *negrita* estilo WhatsApp: se pasa a <b>.
 function textToHtml(texto) {
   return esc(texto)
@@ -38,7 +42,7 @@ export function buildReclamoEmail({ numero, texto }, { siteUrl = process.env.SIT
   const boton = chatLink
     ? `<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="background:#d7141a;border-radius:8px"><a href="${esc(chatLink)}" style="display:inline-block;padding:12px 22px;color:#ffffff;font-weight:bold;text-decoration:none;font-size:15px">Ir al chat de la 126</a></td></tr></table>`
     : '';
-  const html = `<!doctype html><html><body style="margin:0;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;color:#1f2937">
+  const html = toAscii(`<!doctype html><html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head><body style="margin:0;background:#f4f4f5;font-family:Arial,Helvetica,sans-serif;color:#1f2937">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:24px 12px"><tr><td align="center">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;overflow:hidden">
 <tr><td style="background:#d7141a;padding:20px 28px;color:#ffffff;font-size:22px;font-weight:bold">Línea 126</td></tr>
@@ -48,7 +52,7 @@ export function buildReclamoEmail({ numero, texto }, { siteUrl = process.env.SIT
 ${boton}
 </td></tr>
 <tr><td style="padding:16px 28px;font-size:12px;color:#6b7280;border-top:1px solid #f0f0f0">Recibiste este mail porque hiciste un reclamo en la Línea 126. Por favor no respondas a este correo.</td></tr>
-</table></td></tr></table></body></html>`;
+</table></td></tr></table></body></html>`);
   const text = `${texto.replace(/\*([^*\n]+)\*/g, '$1')}\n\nN° de reclamo: ${numero}${link ? `\nSeguí tu reclamo: ${link}` : ''}\n\nEste mail es automático y no recibe respuestas.${chatLink ? ` Si necesitás algo más, escribinos por el chat: ${chatLink}` : ''}`;
   return { subject, html, text };
 }
