@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { listPostulaciones, updatePostulacionEstado, getPostulacionCv } from '../services/postulacion.service.js';
+import { listPostulaciones, updatePostulacionEstado, getPostulacionCv, reanalizarPostulacion } from '../services/postulacion.service.js';
 
 const router = Router();
 
@@ -22,6 +22,14 @@ router.get('/:id/cv', async (req, res) => {
     res.send(cv.buffer);
   } catch (err) {
     res.status(500).json({ error: err.message });
+  }
+});
+
+router.post('/:id/analizar', async (req, res) => {
+  try {
+    res.json({ analisis: await reanalizarPostulacion(req.params.id) });
+  } catch (err) {
+    res.status(err.status ?? 500).json({ error: err.message });
   }
 });
 

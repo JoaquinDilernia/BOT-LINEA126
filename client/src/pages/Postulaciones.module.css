@@ -82,3 +82,35 @@
   .filters { width: 100%; }
   .filters select { flex: 1; }
 }
+
+/* Análisis con IA */
+.headRight { display: flex; gap: var(--space-2); align-items: center; }
+.score {
+  min-width: 44px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--font-size-md);
+}
+.scoreAlto { background: var(--color-success-bg); color: var(--color-success); }
+.scoreMedio { background: var(--color-warning-bg); color: var(--color-warning); }
+.scoreBajo { background: var(--color-error-bg); color: var(--color-error); }
+.ia {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+.iaLabel { font-weight: 700; color: var(--color-text-muted); font-size: var(--font-size-xs, 12px); text-transform: uppercase; letter-spacing: .04em; }
+.iaResumen { margin-top: 4px; }
+.iaMotivo { margin-top: 4px; color: var(--color-text-muted); }
+.iaAlertas { margin: 6px 0 0 18px; color: var(--color-warning); }
+.iaFoot { display: flex; justify-content: space-between; align-items: center; gap: var(--space-2); margin-top: var(--space-2); color: var(--color-text-muted); }
+.linkBtn { background: none; border: none; padding: 0; color: var(--brand-ink); font: inherit; font-weight: 600; cursor: pointer; }
+.linkBtn:disabled { opacity: .5; cursor: default; }

@@ -1,4 +1,5 @@
 import { getDb } from './firebase.service.js';
+import { analizarPostulacion } from './postulacionAnalisis.js';
 
 const COLLECTION = 'bot-linea126_postulaciones';
 
@@ -58,8 +59,12 @@ export async function createPostulacion(body, file = null) {
       batch.set(ref.collection('cv').doc(String(i)), { data: file.buffer.subarray(i * CV_CHUNK_BYTES, (i + 1) * CV_CHUNK_BYTES) });
     }
   }
-  batch.set(ref, { ...data, cv, estado: 'nueva', createdAt: new Date() });
+  batch.set(ref, { ...data, cv, estado: 'nueva', analisis: { status: 'pending' }, createdAt: new Date() });
   await batch.commit();
+  // Resumen + puntaje con IA en segundo plano: el postulante no espera.
+  analizarPostulacion(data, cv ? file.buffer : null)
+    .then(analisis => ref.update({ analisis: { ...analisis, analizadoAt: new Date() } }))
+    .catch(err => console.error('[postulaciones] No se guardó el análisis:', err.message));
   return { id: ref.id };
 }
 
@@ -81,4 +86,14 @@ export async function listPostulaciones() {
 export async function updatePostulacionEstado(id, estado) {
   if (!['nueva', 'vista', 'contactada', 'descartada'].includes(estado)) throw invalid('Estado inválido');
   await getDb().collection(COLLECTION).doc(id).update({ estado, updatedAt: new Date() });
+}
+
+export async function reanalizarPostulacion(id) {
+  const ref = getDb().collection(COLLECTION).doc(id);
+  const doc = await ref.get();
+  if (!doc.exists) { const e = new Error('Postulación no encontrada'); e.status = 404; throw e; }
+  const cv = await getPostulacionCv(id);
+  const analisis = { ...(await analizarPostulacion(doc.data(), cv?.buffer ?? null)), analizadoAt: new Date() };
+  await ref.update({ analisis });
+  return analisis;
 }
