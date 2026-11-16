@@ -38,6 +38,7 @@ export default function Reclamos() {
   const [savingComment, setSavingComment] = useState(false);
   const [responseText, setResponseText] = useState('');
   const [savingResponse, setSavingResponse] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => { load(); }, [filterEstado, filterPrioridad, filterCategoria, filterGravedad]);
 
@@ -69,6 +70,25 @@ export default function Reclamos() {
       const { ticket } = await r.json();
       setSelected(ticket);
       setTickets(prev => prev.map(t => (t.id === ticket.id ? ticket : t)));
+    }
+  }
+
+  async function deleteSelected() {
+    if (!selected) return;
+    const nombre = selected.numero ?? selected.titulo;
+    if (!window.confirm(`¿Eliminar el reclamo ${nombre}? Se borra para siempre y deja de contar en las estadísticas.`)) return;
+    setDeleting(true);
+    try {
+      const r = await authFetch(BASE_URL + `/api/reclamos/${selected.id}`, { method: 'DELETE' });
+      if (r.ok) {
+        setTickets(prev => prev.filter(t => t.id !== selected.id));
+        setSelected(null);
+      } else {
+        const data = await r.json().catch(() => ({}));
+        alert(`⚠️ ${data.error ?? 'No se pudo eliminar el reclamo'}`);
+      }
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -264,6 +284,9 @@ export default function Reclamos() {
             <div className={styles.detailTitleRow}>
               {selected.numero && <span className={styles.detailNumero}>{selected.numero}</span>}
               <h2 className={styles.detailTitle}>{selected.titulo}</h2>
+              <button className={styles.deleteBtn} onClick={deleteSelected} disabled={deleting} title="Eliminar reclamo">
+                {deleting ? 'Eliminando...' : '🗑 Eliminar'}
+              </button>
             </div>
             {selected.notificationStatus === 'failed' && (
               <div className={styles.notifyWarning}>⚠️ Falló el envío de la última respuesta por WhatsApp. Revisá los logs del servidor o probá de nuevo.</div>

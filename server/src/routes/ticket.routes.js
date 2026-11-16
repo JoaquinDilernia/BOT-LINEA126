@@ -3,7 +3,7 @@ import multer from 'multer';
 import { uploadMetaMedia } from '../services/meta.service.js';
 import { requireAtLeastAtencionCliente } from '../middleware/requireAuth.js';
 import {
-  getAllTickets, getTicketById, createTicket, updateTicket, addComment, respondTicket,
+  getAllTickets, getTicketById, createTicket, updateTicket, deleteTicket, addComment, respondTicket,
   getReclamosConfig, updateReclamosConfig, createCargaBatch, gravedadDe, CATEGORIAS_RECLAMO,
 } from '../services/ticket.service.js';
 import { aggregateReclamos } from '../services/reclamoStats.js';
@@ -97,6 +97,16 @@ router.put('/:id', async (req, res) => {
   try {
     const ticket = await updateTicket(req.params.id, req.body);
     res.json({ ticket });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.delete('/:id', requireAtLeastAtencionCliente, async (req, res) => {
+  try {
+    if (!(await deleteTicket(req.params.id))) return res.status(404).json({ error: 'Reclamo no encontrado' });
+    console.log(`[reclamos] ${req.params.id} eliminado por ${req.agent.email}`);
+    res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

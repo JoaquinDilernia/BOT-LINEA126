@@ -299,6 +299,17 @@ export async function updateTicket(id, { titulo, descripcion, prioridad, categor
   return ticket;
 }
 
+// Borrado definitivo (reclamos de prueba, duplicados, spam). El número
+// R126-xxxxxx no se reutiliza: el contador no se toca. Si tenía respuesta
+// automática programada, desaparece con el documento.
+export async function deleteTicket(id) {
+  const docRef = getDb().collection(COLLECTION).doc(id);
+  const doc = await docRef.get();
+  if (!doc.exists) return false;
+  await docRef.delete();
+  return true;
+}
+
 export async function addComment(id, { autor, texto }) {
   const db = getDb();
   const docRef = db.collection(COLLECTION).doc(id);
