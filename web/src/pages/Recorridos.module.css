@@ -88,3 +88,7 @@
   margin-top: 36px; text-align: center;
 }
 .help p { font-family: var(--font-display); font-weight: 700; font-size: 26px; text-transform: uppercase; }
+
+/* "La Tablada ⇄ Retiro": dos flechas = ida y vuelta */
+.ramalRuta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.ramalRuta svg { width: 20px; height: 20px; flex: none; color: var(--red); }

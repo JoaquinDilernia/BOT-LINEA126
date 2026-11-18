@@ -1,5 +1,6 @@
 import { getDb } from './firebase.service.js';
 import { analizarPostulacion } from './postulacionAnalisis.js';
+import { avisarPostulacion } from './mail.service.js';
 
 const COLLECTION = 'bot-linea126_postulaciones';
 
@@ -62,9 +63,16 @@ export async function createPostulacion(body, file = null) {
   batch.set(ref, { ...data, cv, estado: 'nueva', analisis: { status: 'pending' }, createdAt: new Date() });
   await batch.commit();
   // Resumen + puntaje con IA en segundo plano: el postulante no espera.
+  // Después se manda el mail a RRHH (con el CV adjunto y el puntaje).
+  const createdAt = new Date();
   analizarPostulacion(data, cv ? file.buffer : null)
-    .then(analisis => ref.update({ analisis: { ...analisis, analizadoAt: new Date() } }))
-    .catch(err => console.error('[postulaciones] No se guardó el análisis:', err.message));
+    .then(async analisis => {
+      await ref.update({ analisis: { ...analisis, analizadoAt: new Date() } })
+        .catch(err => console.error('[postulaciones] No se guardó el análisis:', err.message));
+      return analisis;
+    })
+    .catch(() => null)
+    .then(analisis => avisarPostulacion({ ...data, cv, createdAt }, cv ? file.buffer : null, analisis));
   return { id: ref.id };
 }
 

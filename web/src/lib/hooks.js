@@ -42,6 +42,6 @@ export function useReveal(deps = []) {
 
 export function usePageTitle(title) {
   useEffect(() => {
-    document.title = title ? `${title} · Línea 126` : 'Línea 126 — Retiro ⇄ La Tablada · Cárdenas S.A.';
+    document.title = title ? `${title} · Línea 126` : 'Línea 126 — La Tablada ⇄ Retiro · Cárdenas S.A.';
   }, [title]);
 }

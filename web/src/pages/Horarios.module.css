@@ -60,3 +60,7 @@
 .tlTime b { color: var(--ink); font-variant-numeric: tabular-nums; }
 .note { display: flex; gap: 10px; margin-top: 26px; max-width: 780px; color: var(--mute); font-size: 15px; }
 .note svg { width: 20px; height: 20px; flex: none; margin-top: 2px; color: var(--red); }
+
+/* "La Tablada ⇄ Retiro": dos flechas = ida y vuelta */
+.ramalRuta { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
+.ramalRuta svg { width: 16px; height: 16px; flex: none; color: var(--red); }

@@ -89,7 +89,7 @@ export default function SiteLayout() {
         <div className={`container ${s.footerGrid}`}>
           <div className={s.footerBrand}>
             <Logo inverted />
-            <p>Retiro ⇄ La Tablada y Cementerio de Villegas. Más de 27 km uniendo el centro porteño con La Matanza, todos los días.</p>
+            <p>La Tablada y Cementerio de Villegas ⇄ Retiro. Más de 27 km uniendo el centro porteño con La Matanza, todos los días.</p>
             <div className={s.footerBtns}>
               <button type="button" className="btn btn--light btn--sm" onClick={() => openChat()}><IconChat /> Chat 24 h</button>
               {puedeInstalar && <button type="button" className={`btn btn--sm ${s.installBtn}`} onClick={instalar}><IconPhone /> Instalar la app</button>}

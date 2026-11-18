@@ -20,25 +20,25 @@ export const EMPRESA = {
 // viejos C y D (Caballito); los expresos E y F pasaron a llamarse C y D.
 export const RAMALES = [
   {
-    letra: 'A', tipo: 'comun', desde: 'Retiro', hasta: 'La Tablada',
+    letra: 'A', tipo: 'comun', desde: 'La Tablada', hasta: 'Retiro',
     detalle: 'Av. D. A. Maradona 4920',
     horario: 'Todos los días, las 24 horas',
     via: 'Por Plaza de Mayo, San Telmo, Boedo, Caballito, Flores y Mataderos.',
   },
   {
-    letra: 'B', tipo: 'comun', desde: 'Retiro', hasta: 'Cementerio de Villegas',
+    letra: 'B', tipo: 'comun', desde: 'Cementerio de Villegas', hasta: 'Retiro',
     detalle: 'Pedro León Gallo y Peribebuy',
     horario: 'Todos los días, las 24 horas',
     via: 'Igual que el A hasta Av. Crovara; sigue por Centenera, José C. Paz y Ambrosetti.',
   },
   {
-    letra: 'C', tipo: 'expreso', desde: 'Retiro', hasta: 'La Tablada',
+    letra: 'C', tipo: 'expreso', desde: 'La Tablada', hasta: 'Retiro',
     detalle: 'Expreso por AU 25 de Mayo',
     horario: 'Días hábiles · a Retiro 7:40–9:40 · a provincia 17:30–19:30',
     via: 'Sobre la traza del A, por Autopista 25 de Mayo y Perito Moreno.',
   },
   {
-    letra: 'D', tipo: 'expreso', desde: 'Retiro', hasta: 'Cementerio de Villegas',
+    letra: 'D', tipo: 'expreso', desde: 'Cementerio de Villegas', hasta: 'Retiro',
     detalle: 'Expreso por AU 25 de Mayo',
     horario: 'Días hábiles · a Retiro 7:00–9:00 · a provincia 17:00–19:00',
     via: 'Sobre la traza del B, por Autopista 25 de Mayo y Perito Moreno.',

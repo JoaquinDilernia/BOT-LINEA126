@@ -159,7 +159,7 @@ export default function Recorridos() {
         <div className={styles.editor}>
           <h2>{editing.id ? 'Editar recorrido' : 'Nuevo recorrido'}</h2>
           <div className={styles.row}>
-            <label>Nombre<input value={editing.nombre} onChange={e => setEditing({ ...editing, nombre: e.target.value })} placeholder="Ramal A — Retiro ⇄ La Tablada" /></label>
+            <label>Nombre<input value={editing.nombre} onChange={e => setEditing({ ...editing, nombre: e.target.value })} placeholder="Ramal A — La Tablada ⇄ Retiro" /></label>
             <label>Línea<input value={editing.lineaNombre} onChange={e => setEditing({ ...editing, lineaNombre: e.target.value })} placeholder="Línea 126" /></label>
           </div>
           <label>Descripción<textarea rows={2} value={editing.descripcion} onChange={e => setEditing({ ...editing, descripcion: e.target.value })} /></label>

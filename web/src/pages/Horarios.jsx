@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import PageHero from '../components/PageHero.jsx';
 import RamalBadge from '../components/RamalBadge.jsx';
-import { IconChat, IconClock, IconInfo } from '../components/icons.jsx';
+import { IconChat, IconClock, IconInfo, IconSwap } from '../components/icons.jsx';
 import { usePageTitle, useReveal } from '../lib/hooks.js';
 import { useChat } from '../lib/chat.jsx';
 import { FRECUENCIAS, RAMALES, SECCIONADOS } from '../data/linea.js';
@@ -98,7 +98,7 @@ export default function Horarios() {
                     <li key={r.letra}>
                       <RamalBadge letra={r.letra} tipo={r.tipo} size="sm" />
                       <div>
-                        <strong>{r.desde} — {r.hasta}</strong>
+                        <strong className={s.ramalRuta}>{r.desde} <IconSwap /> {r.hasta}</strong>
                         <span>{r.horario}</span>
                       </div>
                     </li>

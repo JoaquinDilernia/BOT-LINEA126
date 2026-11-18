@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import PageHero from '../components/PageHero.jsx';
 import RouteMap from '../components/RouteMap.jsx';
 import RamalBadge from '../components/RamalBadge.jsx';
-import { IconChat, IconClock, IconInfo, IconSearch } from '../components/icons.jsx';
+import { IconChat, IconClock, IconInfo, IconSearch, IconSwap } from '../components/icons.jsx';
 import { useApi, usePageTitle, useReveal } from '../lib/hooks.js';
 import { useChat } from '../lib/chat.jsx';
 import { RAMALES, TIPO_RAMAL } from '../data/linea.js';
@@ -137,7 +137,7 @@ export default function Recorridos() {
                 <RamalBadge letra={r.letra} tipo={r.tipo} size="lg" />
                 <div>
                   <span className={s.ramalTipo}>{TIPO_RAMAL[r.tipo]}</span>
-                  <h3>{r.desde} — {r.hasta}</h3>
+                  <h3 className={s.ramalRuta}>{r.desde} <IconSwap /> {r.hasta}</h3>
                   <p>{r.via}</p>
                   <p className={s.ramalHorario}><IconClock /> {r.horario}</p>
                 </div>

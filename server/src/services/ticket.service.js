@@ -2,7 +2,7 @@ import { getDb } from './firebase.service.js';
 import { listUsers } from './auth.service.js';
 import { getAllTemplates } from './template.service.js';
 import { sendWhatsAppTemplate, sendWhatsAppMessage, sendInstagramMessage } from './meta.service.js';
-import { mailRespuestaReclamo, normalizeEmail } from './mail.service.js';
+import { mailRespuestaReclamo, normalizeEmail, avisarReclamo } from './mail.service.js';
 import { DEFAULT_RESPUESTA_COMUN, DEFAULT_DEMORA_HORAS, programarRespuestaAt, renderRespuesta } from './reclamoRespuesta.js';
 import { appendMessage } from './conversation.service.js';
 import { monthKey } from './reclamoStats.js';
@@ -202,6 +202,11 @@ export async function createTicket({ titulo, descripcion, contactId = null, prio
     resolvedAt: auto ? now : null,
   };
   const ref = await db.collection(COLLECTION).add(ticket);
+  // Aviso por mail a la empresa de los reclamos que mandan los pasajeros
+  // (los que carga el equipo desde el panel no). No frena la respuesta.
+  if (ticket.origen !== 'panel') {
+    avisarReclamo(ticket, { categoriaLabel: CATEGORIAS_RECLAMO.find(c => c.id === cat)?.label ?? cat });
+  }
   return { id: ref.id, ...ticket };
 }
 
