@@ -81,16 +81,27 @@ function Criterios({ onSaved }) {
         </fieldset>
       </div>
       <label className={styles.field}>
-        <span>Respuesta a los reclamos comunes (se manda sola unas horas después del reclamo)</span>
+        <span>Respuesta a los reclamos comunes (se manda sola al día siguiente del reclamo)</span>
         <textarea rows={8} value={config.respuestaComun ?? ''} onChange={e => setConfig({ ...config, respuestaComun: e.target.value })} />
       </label>
       <p className={styles.hint}>
-        Se completa con los datos del reclamo: <b>{'{numero}'}</b> N° de reclamo · <b>{'{interno}'}</b> · <b>{'{ramal}'}</b> · <b>{'{hora}'}</b> · <b>{'{lugar}'}</b> · <b>{'{viaje}'}</b> arma la frase entera con lo que haya (ej. “el interno 36 del ramal A, cerca de las 18:30, en Av. Crovara 2500”). Nunca se manda entre las 22 y las 8: se corre a las 8.
+        Se completa con los datos del reclamo: <b>{'{numero}'}</b> N° de reclamo · <b>{'{interno}'}</b> · <b>{'{ramal}'}</b> · <b>{'{hora}'}</b> · <b>{'{lugar}'}</b> · <b>{'{viaje}'}</b> arma la frase entera con lo que haya (ej. “el interno 36 del ramal A, cerca de las 18:30, en Av. Crovara 2500”).
       </p>
-      <label className={styles.field} style={{ maxWidth: 220 }}>
-        <span>Mandarla a las (horas)</span>
-        <input type="number" min={0} max={20} step={0.5} value={config.demoraRespuestaHoras ?? 3} onChange={e => setConfig({ ...config, demoraRespuestaHoras: e.target.value })} />
-      </label>
+      <div className={styles.field}>
+        <span>Horarios de envío (entre las 9 y las 18)</span>
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          {[0, 1, 2].map(i => {
+            const horarios = config.horariosRespuesta ?? ['10:00', '13:00', '16:30'];
+            return (
+              <input key={i} type="time" min="09:00" max="18:00" style={{ maxWidth: 130 }} value={horarios[i] ?? ''}
+                onChange={e => { const h = [...horarios]; h[i] = e.target.value; setConfig({ ...config, horariosRespuesta: h }); }} />
+            );
+          })}
+        </div>
+      </div>
+      <p className={styles.hint}>
+        La respuesta sale <b>al día siguiente</b> del reclamo, en uno de estos horarios elegido al azar y con unos minutos de más (por ejemplo 13:07 en vez de 13:00), para que no se note que es automática.
+      </p>
       <div className={styles.actions}>
         {saved && <span className={styles.ok}>✓ Guardado</span>}
         <button className={styles.primaryBtn} onClick={save} disabled={saving}>{saving ? 'Guardando…' : 'Guardar criterios'}</button>

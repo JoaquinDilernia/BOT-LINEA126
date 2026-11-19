@@ -3,7 +3,7 @@ import { listUsers } from './auth.service.js';
 import { getAllTemplates } from './template.service.js';
 import { sendWhatsAppTemplate, sendWhatsAppMessage, sendInstagramMessage } from './meta.service.js';
 import { mailRespuestaReclamo, normalizeEmail, avisarReclamo } from './mail.service.js';
-import { DEFAULT_RESPUESTA_COMUN, DEFAULT_DEMORA_HORAS, programarRespuestaAt, renderRespuesta } from './reclamoRespuesta.js';
+import { DEFAULT_RESPUESTA_COMUN, DEFAULT_HORARIOS_RESPUESTA, normalizarHorarios, programarRespuestaAt, renderRespuesta } from './reclamoRespuesta.js';
 import { appendMessage } from './conversation.service.js';
 import { monthKey } from './reclamoStats.js';
 
@@ -48,7 +48,8 @@ export const DEFAULT_RECLAMOS_CONFIG = {
   // `respuestaAutomatica` queda sólo para reclamos sin contacto (cargados
   // desde el panel), que se resuelven al instante como antes.
   respuestaComun: DEFAULT_RESPUESTA_COMUN,
-  demoraRespuestaHoras: DEFAULT_DEMORA_HORAS,
+  // Horarios del día siguiente en los que puede salir (se elige uno al azar).
+  horariosRespuesta: DEFAULT_HORARIOS_RESPUESTA,
 };
 
 export async function getReclamosConfig() {
@@ -56,13 +57,13 @@ export async function getReclamosConfig() {
   return { ...DEFAULT_RECLAMOS_CONFIG, ...(doc.exists ? doc.data() : {}) };
 }
 
-export async function updateReclamosConfig({ categoriasGraves, respuestaAutomatica, categoriasSinInterno, respuestaComun, demoraRespuestaHoras } = {}) {
+export async function updateReclamosConfig({ categoriasGraves, respuestaAutomatica, categoriasSinInterno, respuestaComun, horariosRespuesta } = {}) {
   const update = { updatedAt: new Date() };
   if (Array.isArray(categoriasGraves)) update.categoriasGraves = categoriasGraves.filter(c => CATEGORIA_IDS.includes(c));
   if (Array.isArray(categoriasSinInterno)) update.categoriasSinInterno = categoriasSinInterno.filter(c => CATEGORIA_IDS.includes(c));
   if (typeof respuestaAutomatica === 'string' && respuestaAutomatica.trim()) update.respuestaAutomatica = respuestaAutomatica.trim().slice(0, 1500);
   if (typeof respuestaComun === 'string' && respuestaComun.trim()) update.respuestaComun = respuestaComun.trim().slice(0, 1500);
-  if (demoraRespuestaHoras !== undefined && demoraRespuestaHoras !== '' && Number.isFinite(Number(demoraRespuestaHoras))) update.demoraRespuestaHoras = Math.min(Math.max(Number(demoraRespuestaHoras), 0), 20);
+  if (Array.isArray(horariosRespuesta)) update.horariosRespuesta = normalizarHorarios(horariosRespuesta);
   await CONFIG_REF().set(update, { merge: true });
   return getReclamosConfig();
 }
@@ -161,7 +162,7 @@ export async function getDefaultAssignee() {
 
 // Los graves quedan abiertos en la bandeja. Los comunes con un pasajero a
 // quien contestarle quedan "en progreso" con la respuesta programada para
-// unas horas después (la manda enviarRespuestasProgramadas); los que no
+// al día siguiente (la manda enviarRespuestasProgramadas); los que no
 // tienen contacto nacen resueltos como antes. `numeroUnidad` es el interno.
 export async function createTicket({ titulo, descripcion, contactId = null, prioridad = 'media', categoria = 'otro', imagenes = [], createdBy, numeroUnidad = '', ramal = '', lugarHecho = '', horaHecho = '', email = '', canal = null, origen }) {
   const db = getDb();
@@ -196,7 +197,7 @@ export async function createTicket({ titulo, descripcion, contactId = null, prio
     comentarios: [],
     respuestas: auto ? [{ autor: 'Respuesta automática', texto: config.respuestaAutomatica, automatica: true, createdAt: now }] : [],
     ...(auto && { notificationStatus: 'auto' }),
-    ...(programada && { notificationStatus: 'scheduled', respuestaProgramadaAt: programarRespuestaAt(now, config.demoraRespuestaHoras) }),
+    ...(programada && { notificationStatus: 'scheduled', respuestaProgramadaAt: programarRespuestaAt(now, config.horariosRespuesta) }),
     createdAt: now,
     updatedAt: now,
     resolvedAt: auto ? now : null,
