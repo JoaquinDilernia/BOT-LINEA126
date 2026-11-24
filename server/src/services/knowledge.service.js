@@ -47,7 +47,7 @@ El recorrido completo parada por parada y las secciones de tarifa están en el b
 - Sábados: de 4:00 a 24:00. Cada 30 min de 4 a 5, cada 15 min de 5 a 6, cada 10 min de 6 a 19 y cada 15 min hasta medianoche (107 servicios por sentido).
 - Domingos y feriados: de 6:00 a 24:00. Cada 15 min de 6 a 8, cada 12 min de 8 a 20 y cada 15 min hasta medianoche (86 servicios por sentido).
 Tiempo de viaje Retiro ⇄ La Tablada: unos 100 minutos en hora pico y 82 en horario valle.
-Los ramales C, D, E y F sólo funcionan en días hábiles, en las franjas indicadas en "Ramales y cabeceras".
+Los expresos C y D sólo funcionan en días hábiles, en las franjas indicadas en "Ramales y cabeceras".
 Los horarios son programados: el tránsito puede generar demoras. Para ver cuánto falta para que llegue el colectivo a una parada se pueden usar las apps "Cuándo Llega", BA Cómo Llego, Moovit o Transit.`,
   },
   {
@@ -79,7 +79,7 @@ No se puede fumar, comer ni viajar en el estribo. Se sube por adelante y se baja
   {
     title: 'Trabajá con nosotros y contacto institucional',
     order: 8,
-    content: `Búsquedas laborales (choferes con licencia profesional D1/D2, mecánicos, administrativos): se puede dejar el CV en la sección "Trabajá con nosotros" del sitio web o personalmente en Av. D. A. Maradona 4920, La Tablada, de lunes a viernes de 9 a 16.
+    content: `Búsquedas laborales (choferes con licencia profesional, mecánicos, administrativos): se puede dejar el CV en la sección "Trabajá con nosotros" del sitio web o personalmente en Av. D. A. Maradona 4920, La Tablada, de lunes a viernes de 8 a 15.
 Prensa, empresas e instituciones: contactar por el formulario del sitio web o al (011) 4482-1639.`,
   },
 ];

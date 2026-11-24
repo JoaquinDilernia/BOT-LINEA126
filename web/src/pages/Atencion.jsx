@@ -47,7 +47,7 @@ export default function Atencion() {
           <div className="sectionHead reveal">
             <span className="kicker">Hacé tu reclamo</span>
             <h2>¿Qué pasó en tu viaje?</h2>
-            <p>Elegí el motivo y el chat te pide los datos: ramal, día, horario, lugar y el número de interno del colectivo.</p>
+            <p>Elegí el motivo y el chat te pide los datos: ramal, día, horario, lugar, el número de interno del colectivo y tu email, porque la respuesta te llega por mail.</p>
           </div>
           <div className={s.cats}>
             {CATEGORIAS_RECLAMO.map((c) => {

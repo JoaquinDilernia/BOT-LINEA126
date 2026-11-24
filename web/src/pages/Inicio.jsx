@@ -167,7 +167,7 @@ export default function Inicio() {
         <div className="container">
           <div className={`sectionHead reveal`}>
             <span className="kicker">Nuestros ramales</span>
-            <h2>Un recorrido, seis formas de viajar</h2>
+            <h2>Un recorrido, cuatro formas de viajar</h2>
             <p>Mirá el cartel del colectivo: la letra te dice el ramal. Los expresos usan la Autopista 25 de Mayo en horario pico.</p>
           </div>
           <div className={s.ramales}>
@@ -240,7 +240,7 @@ export default function Inicio() {
               <p className={s.pUser}>Hola, ¿el 126 me deja en el Hospital Santa Lucía?</p>
               <p className={s.pBot}>¡Sí! Bajate en <strong>Av. San Juan y Sarandí</strong>, a media cuadra del hospital. Desde La Tablada son 7 secciones: el boleto sale <strong>{peso(1151.36)}</strong> con SUBE registrada.</p>
               <p className={s.pUser}>Genial, ¿y cada cuánto pasa a la tarde?</p>
-              <p className={s.pBot}>Entre las 17 y las 19:30 pasa cada <strong>6 a 7 minutos</strong> 🚌</p>
+              <p className={s.pBot}>En días hábiles, hasta las 20 h pasa cada <strong>4 minutos</strong> 🚌</p>
             </div>
           </div>
         </div>

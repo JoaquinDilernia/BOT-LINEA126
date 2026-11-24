@@ -386,7 +386,7 @@ async function processIncomingMessageInternal(msg) {
         categoria: reclamoParams.categoria || 'otro',
         imagenes: imageMediaId ? [{ mediaId: imageMediaId, mimeType: 'image/jpeg' }] : [],
         numeroUnidad: internoReclamo,
-        ramal: /^[A-F]$/i.test(String(reclamoParams.ramal ?? '').trim()) ? String(reclamoParams.ramal).trim() : '',
+        ramal: /^[A-D]$/i.test(String(reclamoParams.ramal ?? '').trim()) ? String(reclamoParams.ramal).trim() : '',
         lugarHecho: String(reclamoParams.lugar ?? '').trim(),
         horaHecho: String(reclamoParams.hora ?? '').trim(),
         email: emailReclamo,
@@ -409,7 +409,7 @@ async function processIncomingMessageInternal(msg) {
       else if (channel === 'instagram') await sendInstagramMessage(from, confirmMsg).catch(() => {});
     } catch (err) {
       console.error('[bot] Error creando reclamo:', err.message);
-      const failMsg = 'Che, tuvimos un problema técnico registrando tu reclamo. Por favor volvé a intentarlo en unos minutos.';
+      const failMsg = 'Tuvimos un problema técnico registrando tu reclamo. Por favor volvé a intentarlo en unos minutos.';
       await appendMessage(from, { role: 'assistant', content: failMsg }).catch(() => {});
       await setUrgentFlag(from, true).catch(() => {});
       if (channel === 'whatsapp') await sendWhatsAppMessage(from, failMsg).catch(() => {});
