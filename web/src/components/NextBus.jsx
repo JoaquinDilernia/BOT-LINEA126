@@ -39,7 +39,7 @@ export default function NextBus({ clock, dark = false, defaultPunto = 5 }) {
           <small><IconClock /> estimado {fmtHora(primero.hora)}{siguientes.length > 0 && ` · después en ${siguientes.map((x) => Math.round(x.en)).join(' y ')} min`}</small>
         </div>
       )}
-      <p className={s.note}>Estimado según el horario programado. Puede variar por el tránsito.</p>
+      <p className={s.note}>Estimado según el horario programado. Puede variar por el tránsito. Para ver el colectivo en vivo usá la app oficial <a href="https://www.argentina.gob.ar/aplicaciones/cuandosubo" target="_blank" rel="noopener">Cuándo SUBO</a>.</p>
     </div>
   );
 }

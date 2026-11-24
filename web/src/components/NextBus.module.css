@@ -36,3 +36,4 @@
 .dark .live { color: #ff5a5f; }
 .dark .note { color: #8f8f94; }
 @media (prefers-reduced-motion: reduce) { .live i, .big strong { animation: none; } }
+.note a { color: inherit; font-weight: 600; text-decoration: underline; }

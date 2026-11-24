@@ -206,6 +206,7 @@ export const LUGARES = [
 export const BARRIOS = ['Retiro', 'San Nicolás', 'Monserrat', 'San Telmo', 'Constitución', 'San Cristóbal', 'Boedo', 'Caballito', 'Parque Chacabuco', 'Flores', 'Parque Avellaneda', 'Mataderos', 'Villa Madero', 'La Tablada', 'Villegas'];
 
 export const FAQ = [
+  { q: '¿Cómo sé cuánto falta para que llegue el colectivo?', a: 'Con la app oficial Cuándo SUBO (del Ministerio de Transporte, gratis para Android y iPhone): elegís la línea 126 o tu parada y ves los colectivos en tiempo real y en cuántos minutos llegan. En esta web, el horario de Próximo colectivo es un estimado según el horario programado.' },
   { q: '¿Cómo pago el boleto?', a: 'Sólo con tarjeta SUBE. Al subir decile al chofer hasta dónde viajás y apoyá la tarjeta. Registrala a tu nombre: sin registrar el boleto sale el doble.' },
   { q: '¿El colectivo funciona de noche?', a: 'Sí. La 126 funciona las 24 horas, todos los días. De 0 a 3 h pasa cada 30 minutos.' },
   { q: '¿Qué ramal me deja más cerca?', a: 'El A termina en La Tablada (Av. D. A. Maradona 4920) y el B en el Cementerio de Villegas (Pedro León Gallo y Peribebuy). En días hábiles, en hora pico, el C y el D son los expresos por autopista. Preguntale al asistente desde dónde y hasta dónde viajás.' },
