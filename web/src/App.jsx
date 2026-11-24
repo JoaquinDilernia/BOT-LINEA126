@@ -1,4 +1,4 @@
-import { HashRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { ChatProvider } from './lib/chat.jsx';
 import SiteLayout from './components/SiteLayout.jsx';
 import Inicio from './pages/Inicio.jsx';
@@ -12,11 +12,13 @@ import Trabaja from './pages/Trabaja.jsx';
 import Contacto from './pages/Contacto.jsx';
 import NotFound from './pages/NotFound.jsx';
 
-// HashRouter: el sitio se sube como estático a Hostinger, sin reglas de
-// reescritura en el servidor.
+// URLs reales (/horarios, /recorridos…) para que Google indexe cada página.
+// Cada ruta se pre-renderiza a HTML (scripts/prerender.mjs) y el .htaccess de
+// Hostinger sirve /horarios → horarios.html. Los links viejos con #/ los
+// convierte main.jsx.
 export default function App() {
   return (
-    <HashRouter>
+    <BrowserRouter>
       <ChatProvider>
         <Routes>
           <Route element={<SiteLayout />}>
@@ -35,6 +37,6 @@ export default function App() {
           </Route>
         </Routes>
       </ChatProvider>
-    </HashRouter>
+    </BrowserRouter>
   );
 }

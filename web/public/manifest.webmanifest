@@ -3,8 +3,8 @@
   "short_name": "Línea 126",
   "description": "Recorridos, horarios, tarifas y asistente de la Línea 126.",
   "lang": "es-AR",
-  "start_url": "./?chat=1#/",
-  "scope": "./",
+  "start_url": "/?chat=1",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#141414",
   "theme_color": "#d7141a",
@@ -15,8 +15,8 @@
     { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
   ],
   "shortcuts": [
-    { "name": "Cómo llego", "url": "./#/como-llego" },
-    { "name": "Hacer un reclamo", "url": "./#/atencion" },
-    { "name": "Horarios", "url": "./#/horarios" }
+    { "name": "Cómo llego", "url": "/como-llego" },
+    { "name": "Hacer un reclamo", "url": "/reclamos" },
+    { "name": "Horarios", "url": "/horarios" }
   ]
 }

@@ -40,8 +40,6 @@ function proximaSalida(salidas, d = new Date()) {
 
 function Expresos() {
   const [turno, setTurno] = useState(() => (new Date().getHours() < 13 ? 'manana' : 'tarde'));
-  const t = HORARIOS_EXPRESOS[turno];
-  const prox = proximaSalida(t.salidas);
   return (
     <section className="section section--soft">
       <div className="container">
@@ -57,28 +55,35 @@ function Expresos() {
             </button>
           ))}
         </div>
-        <div className={`card ${s.xWrap}`}>
-          <table className={s.xTable}>
-            <thead>
-              <tr>
-                <th>{turno === 'manana' ? 'Sale de' : 'Va a'}</th>
-                {t.puntos.map((p) => <th key={p}>{p}</th>)}
-              </tr>
-            </thead>
-            <tbody>
-              {t.salidas.map(([ramal, ...horas], i) => (
-                <tr key={`${ramal}${horas[0]}`} className={i === prox ? s.now : ''}>
-                  <td><div className={s.xRamal}>
-                    <RamalBadge letra={ramal} tipo="expreso" size="sm" />
-                    <span>{CABECERA_EXPRESO[ramal]}</span>
-                    {i === prox && <b className={s.nowTag}>Próximo</b>}
-                  </div></td>
-                  {horas.map((h, j) => <td key={j} className={j === 0 ? s.xSalida : ''}>{h}</td>)}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {/* Las dos tablas van siempre en el HTML (las lee Google); la pestaña sólo oculta una. */}
+        {Object.entries(HORARIOS_EXPRESOS).map(([id, t]) => {
+          const prox = proximaSalida(t.salidas);
+          return (
+            <div key={id} className={`card ${s.xWrap}`} hidden={turno !== id}>
+              <table className={s.xTable}>
+                <caption className="sr-only">Expresos de la Línea 126, {t.titulo.toLowerCase()} ({t.sentido.toLowerCase()}), días hábiles</caption>
+                <thead>
+                  <tr>
+                    <th>{id === 'manana' ? 'Sale de' : 'Va a'}</th>
+                    {t.puntos.map((p) => <th key={p}>{p}</th>)}
+                  </tr>
+                </thead>
+                <tbody>
+                  {t.salidas.map(([ramal, ...horas], i) => (
+                    <tr key={`${ramal}${horas[0]}`} className={i === prox ? s.now : ''}>
+                      <td><div className={s.xRamal}>
+                        <RamalBadge letra={ramal} tipo="expreso" size="sm" />
+                        <span>{CABECERA_EXPRESO[ramal]}</span>
+                        {i === prox && <b className={s.nowTag}>Próximo</b>}
+                      </div></td>
+                      {horas.map((h, j) => <td key={j} className={j === 0 ? s.xSalida : ''}>{h}</td>)}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          );
+        })}
         <p className={`reveal ${s.note}`}><IconInfo /> Horarios programados por la empresa; el tránsito puede generar demoras. En el tramo por autopista no se puede subir ni bajar.</p>
       </div>
     </section>

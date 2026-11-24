@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
 import Logo from './Logo.jsx';
+import Seo from './Seo.jsx';
 import ChatWidget from './ChatWidget.jsx';
 import NovedadesBanner, { useNovedades } from './Novedades.jsx';
 import { IconChat, IconClose, IconMenu, IconPhone, IconPin, IconClock, IconSearch } from './icons.jsx';
@@ -41,6 +42,7 @@ export default function SiteLayout() {
 
   return (
     <>
+      <Seo />
       <a href="#contenido" className={s.skip}>Saltar al contenido</a>
       <NovedadesBanner novedades={novedades} />
       <div className={s.topbar}>
@@ -128,6 +130,7 @@ export default function SiteLayout() {
         <div className={`container ${s.footerLegal}`}>
           <p>© {new Date().getFullYear()} {EMPRESA.nombre} · CUIT {EMPRESA.cuit}</p>
           <p>Servicio de jurisdicción nacional fiscalizado por la CNRT · <a href="https://www.argentina.gob.ar/cnrt" target="_blank" rel="noreferrer">cnrt.gob.ar</a></p>
+          <p className={s.credito}>Desarrollado por <a href="https://techdi.com.ar" target="_blank" rel="noopener">TechDI</a></p>
         </div>
       </footer>
 

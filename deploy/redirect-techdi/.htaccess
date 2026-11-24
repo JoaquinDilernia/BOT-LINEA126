@@ -1,0 +1,5 @@
+# Va en linea126.techdi.com.ar (reemplaza el sitio viejo): todo pasa con 301
+# al dominio nuevo, conservando la ruta y los parámetros. Los links con #/
+# (HashRouter viejo) los resuelve la web nueva en el navegador.
+RewriteEngine On
+RewriteRule ^(.*)$ https://linea126.com.ar/$1 [L,R=301]

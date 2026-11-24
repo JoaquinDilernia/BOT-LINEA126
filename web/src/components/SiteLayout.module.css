@@ -123,3 +123,5 @@
 .footerBtns { display: flex; flex-wrap: wrap; gap: 10px; }
 .installBtn { --btn-bg: transparent; border-color: #4a4a4e; }
 .installBtn:hover { --btn-bg: #222; box-shadow: none; }
+.credito a { color: #fff; font-weight: 600; }
+.credito a:hover { text-decoration: underline; }

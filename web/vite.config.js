@@ -10,6 +10,6 @@ const cacheDir = join(tmpdir(), 'vite-linea126-web');
 export default defineConfig({
   plugins: [react()],
   cacheDir,
-  base: './',
+  base: '/',
   server: { port: 5176 },
 });

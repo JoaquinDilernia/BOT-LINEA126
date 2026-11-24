@@ -40,8 +40,6 @@ export function useReveal(deps = []) {
   }, deps);
 }
 
-export function usePageTitle(title) {
-  useEffect(() => {
-    document.title = title ? `${title} · Línea 126` : 'Línea 126 — La Tablada ⇄ Retiro · Cárdenas S.A.';
-  }, [title]);
-}
+// El título y los meta los pone components/Seo.jsx según la ruta (data/seo.js).
+// eslint-disable-next-line no-unused-vars
+export function usePageTitle(_title) {}

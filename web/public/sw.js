@@ -2,8 +2,8 @@
 // - assets con hash (/assets/*): cache-first;
 // - la página: network-first con copia offline;
 // - la API (chat, reclamos, recorridos): nunca se cachea acá.
-const VERSION = 'l126-v1';
-const SHELL = ['./', './index.html', './favicon.svg', './manifest.webmanifest'];
+const VERSION = 'l126-v2';
+const SHELL = ['/', '/favicon.svg', '/manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
@@ -35,8 +35,8 @@ self.addEventListener('fetch', (e) => {
   if (req.mode === 'navigate') {
     e.respondWith(fetch(req).then((res) => {
       const copia = res.clone();
-      caches.open(VERSION).then((c) => c.put('./index.html', copia));
+      if (res.ok) caches.open(VERSION).then((c) => c.put(req, copia));
       return res;
-    }).catch(() => caches.match('./index.html')));
+    }).catch(() => caches.match(req).then((hit) => hit || caches.match('/'))));
   }
 });

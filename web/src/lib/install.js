@@ -34,6 +34,6 @@ export function useInstallPrompt() {
 export function registrarServiceWorker() {
   if (!('serviceWorker' in navigator) || !import.meta.env.PROD) return;
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
   });
 }
