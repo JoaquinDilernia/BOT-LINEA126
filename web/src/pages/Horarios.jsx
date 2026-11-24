@@ -4,7 +4,7 @@ import RamalBadge from '../components/RamalBadge.jsx';
 import { IconChat, IconClock, IconInfo, IconSwap } from '../components/icons.jsx';
 import { usePageTitle, useReveal } from '../lib/hooks.js';
 import { useChat } from '../lib/chat.jsx';
-import { FRECUENCIAS, RAMALES, SECCIONADOS } from '../data/linea.js';
+import { CABECERA_EXPRESO, FRECUENCIAS, HORARIOS_EXPRESOS, RAMALES, SECCIONADOS } from '../data/linea.js';
 import NextBus from '../components/NextBus.jsx';
 import { useSimClock } from '../lib/useSim.js';
 import s from './Horarios.module.css';
@@ -29,6 +29,60 @@ function franjaActual(franjas, d = new Date()) {
     const [a, b] = f.horario.split('–').map((t) => aMin(t.trim()));
     return now >= a && now < (b === 0 ? 1440 : b);
   });
+}
+
+// Próxima salida del expreso (índice) si hoy es hábil; -1 si ya no hay.
+function proximaSalida(salidas, d = new Date()) {
+  if (diaDeHoy(d) !== 'habil') return -1;
+  const now = d.getHours() * 60 + d.getMinutes();
+  return salidas.findIndex((x) => aMin(x[1]) >= now);
+}
+
+function Expresos() {
+  const [turno, setTurno] = useState(() => (new Date().getHours() < 13 ? 'manana' : 'tarde'));
+  const t = HORARIOS_EXPRESOS[turno];
+  const prox = proximaSalida(t.salidas);
+  return (
+    <section className="section section--soft">
+      <div className="container">
+        <div className="sectionHead reveal">
+          <span className="kicker">Expresos por autopista</span>
+          <h2>Horarios del C y el D</h2>
+          <p>Sólo días hábiles. A la mañana van hacia Retiro y a la tarde vuelven a provincia. El C es el de La Tablada y el D, el de Villegas.</p>
+        </div>
+        <div className={s.tabs} role="tablist" aria-label="Turno">
+          {Object.entries(HORARIOS_EXPRESOS).map(([id, x]) => (
+            <button key={id} type="button" role="tab" aria-selected={turno === id} className={`${s.tab} ${turno === id ? s.tabOn : ''}`} onClick={() => setTurno(id)}>
+              {x.titulo} · {x.sentido}
+            </button>
+          ))}
+        </div>
+        <div className={`card ${s.xWrap}`}>
+          <table className={s.xTable}>
+            <thead>
+              <tr>
+                <th>{turno === 'manana' ? 'Sale de' : 'Va a'}</th>
+                {t.puntos.map((p) => <th key={p}>{p}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {t.salidas.map(([ramal, ...horas], i) => (
+                <tr key={`${ramal}${horas[0]}`} className={i === prox ? s.now : ''}>
+                  <td><div className={s.xRamal}>
+                    <RamalBadge letra={ramal} tipo="expreso" size="sm" />
+                    <span>{CABECERA_EXPRESO[ramal]}</span>
+                    {i === prox && <b className={s.nowTag}>Próximo</b>}
+                  </div></td>
+                  {horas.map((h, j) => <td key={j} className={j === 0 ? s.xSalida : ''}>{h}</td>)}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p className={`reveal ${s.note}`}><IconInfo /> Horarios programados por la empresa; el tránsito puede generar demoras. En el tramo por autopista no se puede subir ni bajar.</p>
+      </div>
+    </section>
+  );
 }
 
 export default function Horarios() {
@@ -114,7 +168,9 @@ export default function Horarios() {
         </div>
       </section>
 
-      <section className="section section--soft">
+      <Expresos />
+
+      <section className="section">
         <div className="container">
           <div className="sectionHead reveal">
             <span className="kicker">Tiempos de viaje</span>

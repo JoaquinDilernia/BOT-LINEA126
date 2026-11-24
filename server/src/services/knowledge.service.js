@@ -19,14 +19,12 @@ Flota moderna con unidades con aire acondicionado y unidades accesibles (piso ba
   {
     title: 'Ramales y cabeceras',
     order: 2,
-    content: `La 126 tiene 6 ramales (letra en el cartel):
-- Ramal A — Retiro ⇄ La Tablada (Av. D. A. Maradona 4920). Servicio común, todos los días.
-- Ramal B — Retiro ⇄ Cementerio de Villegas (Ambrosetti y Peribebuy / Pedro León Gallo y Peribebuy, Villegas). Servicio común, todos los días.
-- Ramal C — Av. Directorio y Av. José María Moreno (Caballito/Parque Chacabuco) ⇄ La Tablada. Sólo días hábiles de 7:00 a 10:30.
-- Ramal D — Av. Directorio y Av. José María Moreno ⇄ Cementerio de Villegas. Sólo días hábiles de 7:00 a 10:30.
-- Ramal E — Retiro ⇄ La Tablada EXPRESO por Autopista 25 de Mayo (AU1) y Perito Moreno (AU6). Días hábiles: hacia Retiro de 7:40 a 9:40; hacia La Tablada de 17:30 a 19:30.
-- Ramal F — Retiro ⇄ Cementerio de Villegas EXPRESO por autopista. Días hábiles: hacia Retiro de 7:00 a 9:00; hacia Cementerio de Villegas de 17:00 a 19:00.
-En los expresos (E y F) no se puede subir ni bajar en el tramo por autopista: hacia provincia, entre Carlos Calvo (subida a la AU1) y Pitágoras y Av. Juan B. Alberdi; hacia Retiro, entre Av. Directorio y Dámaso Larrañaga y Bernardo de Irigoyen y Av. San Juan.
+    content: `La 126 tiene 4 ramales (letra en el cartel):
+- Ramal A — Retiro ⇄ La Tablada (Av. D. A. Maradona 4920). Servicio común, todos los días, las 24 horas.
+- Ramal B — Retiro ⇄ Cementerio de Villegas (Ambrosetti y Peribebuy / Pedro León Gallo y Peribebuy, Villegas). Servicio común, todos los días, las 24 horas.
+- Ramal C — Retiro ⇄ La Tablada EXPRESO por Autopista 25 de Mayo (AU1) y Perito Moreno (AU6). Días hábiles: sale de La Tablada hacia Retiro de 6:17 a 8:26; sale de Retiro hacia La Tablada de 16:26 a 18:20.
+- Ramal D — Retiro ⇄ Cementerio de Villegas EXPRESO por autopista. Días hábiles: sale de Villegas hacia Retiro de 5:48 a 7:50; sale de Retiro hacia Villegas de 16:51 a 18:35.
+En los expresos (C y D) no se puede subir ni bajar en el tramo por autopista: hacia provincia, entre Carlos Calvo (subida a la AU1) y Pitágoras y Av. Juan B. Alberdi; hacia Retiro, entre Av. Directorio y Dámaso Larrañaga y Bernardo de Irigoyen y Av. San Juan.
 Cabecera Retiro: Av. de los Inmigrantes entre Cabo Pablo T. Fels y Av. Antártida Argentina, a pasos de las estaciones Retiro (Mitre, San Martín, Belgrano) y la terminal de ómnibus.`,
   },
   {

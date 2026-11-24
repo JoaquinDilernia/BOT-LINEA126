@@ -34,13 +34,13 @@ export const RAMALES = [
   {
     letra: 'C', tipo: 'expreso', desde: 'La Tablada', hasta: 'Retiro',
     detalle: 'Expreso por AU 25 de Mayo',
-    horario: 'Días hábiles · a Retiro 7:40–9:40 · a provincia 17:30–19:30',
+    horario: 'Días hábiles · salen a Retiro 6:17–8:26 · desde Retiro 16:26–18:20',
     via: 'Sobre la traza del A, por Autopista 25 de Mayo y Perito Moreno.',
   },
   {
     letra: 'D', tipo: 'expreso', desde: 'Cementerio de Villegas', hasta: 'Retiro',
     detalle: 'Expreso por AU 25 de Mayo',
-    horario: 'Días hábiles · a Retiro 7:00–9:00 · a provincia 17:00–19:00',
+    horario: 'Días hábiles · salen a Retiro 5:48–7:50 · desde Retiro 16:51–18:35',
     via: 'Sobre la traza del B, por Autopista 25 de Mayo y Perito Moreno.',
   },
 ];
@@ -96,6 +96,57 @@ export const FRECUENCIAS = {
     ],
   },
 };
+
+// Horarios de los expresos por autopista (cartel oficial de la empresa,
+// nov/2026). Sólo días hábiles. C = desde/hacia La Tablada, D = Villegas.
+// Cada salida: [ramal, ...horarios en el orden de `puntos`]. Copiado tal cual
+// del cartel (ojo: la de Villegas 6:57 dice Rotonda 7:04 y la de Tablada 8:14
+// dice Formosa 8:31; así vienen).
+// También lo usa el bot (server/scripts/kb-expresos-*.mjs arma la KB con esto).
+export const HORARIOS_EXPRESOS = {
+  manana: {
+    titulo: 'Turno mañana',
+    sentido: 'Hacia Retiro',
+    puntos: ['Salida', 'Rotonda', 'Formosa', 'Gral. Paz', 'Larrazábal', 'Escalada'],
+    salidas: [
+      ['D', '05:48', '06:00', '06:08', '06:22', '06:32', '06:37'],
+      ['D', '06:00', '06:12', '06:20', '06:34', '06:44', '06:49'],
+      ['C', '06:17', '06:20', '06:29', '06:44', '06:54', '06:59'],
+      ['C', '06:25', '06:28', '06:37', '06:52', '07:02', '07:07'],
+      ['D', '06:25', '06:37', '06:45', '07:00', '07:10', '07:15'],
+      ['D', '06:33', '06:45', '06:53', '07:08', '07:18', '07:23'],
+      ['C', '06:49', '06:52', '07:01', '07:16', '07:26', '07:31'],
+      ['D', '06:49', '07:01', '07:09', '07:24', '07:34', '07:39'],
+      ['D', '06:57', '07:04', '07:17', '07:32', '07:42', '07:47'],
+      ['C', '07:13', '07:16', '07:25', '07:40', '07:50', '07:55'],
+      ['D', '07:15', '07:27', '07:35', '07:50', '08:00', '08:05'],
+      ['D', '07:26', '07:38', '07:46', '08:01', '08:11', '08:16'],
+      ['C', '07:45', '07:48', '07:57', '08:12', '08:22', '08:27'],
+      ['D', '07:50', '08:02', '08:10', '08:25', '08:35', '08:40'],
+      ['C', '08:14', '08:17', '08:31', '08:43', '08:53', '08:58'],
+      ['C', '08:26', '08:29', '08:40', '08:55', '09:05', '09:10'],
+    ],
+  },
+  tarde: {
+    titulo: 'Turno tarde',
+    sentido: 'Desde Retiro',
+    puntos: ['Salida Retiro', 'Diag. Sur y Bolívar', 'Tacuarí'],
+    salidas: [
+      ['C', '16:26', '16:40', '16:52'],
+      ['C', '16:41', '16:55', '17:06'],
+      ['D', '16:51', '17:05', '17:16'],
+      ['C', '17:01', '17:15', '17:26'],
+      ['D', '17:11', '17:25', '17:36'],
+      ['C', '17:23', '17:37', '17:48'],
+      ['D', '17:36', '17:50', '18:01'],
+      ['C', '17:49', '18:03', '18:14'],
+      ['D', '18:04', '18:18', '18:29'],
+      ['C', '18:20', '18:34', '18:45'],
+      ['D', '18:35', '18:49', '19:00'],
+    ],
+  },
+};
+export const CABECERA_EXPRESO = { C: 'La Tablada', D: 'Villegas' };
 
 // Seccionados del listado oficial de paradas de la empresa (nov/2026), de
 // La Tablada hacia Retiro, con km y tiempos de marcha pico/valle del tramo que
