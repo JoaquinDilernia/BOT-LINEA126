@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { requireAtLeastAtencionCliente } from '../middleware/requireAuth.js';
 import { getAllNovedades, createNovedad, updateNovedad, deleteNovedad, TIPOS_NOVEDAD } from '../services/novedad.service.js';
 import { sugerirPieza } from '../services/novedadPieza.service.js';
+import { redactarNovedad } from '../services/novedadRedactar.service.js';
 
 const router = Router();
 
@@ -25,6 +26,12 @@ router.post('/', requireAtLeastAtencionCliente, async (req, res) => {
 // (recibe los datos en el body, así sirve también antes de guardarla).
 router.post('/pieza/sugerir', requireAtLeastAtencionCliente, async (req, res) => {
   res.json(await sugerirPieza(req.body ?? {}));
+});
+
+// "Ordenar con IA": reescribe el detalle (y el título si hace falta) claro
+// para el pasajero. Sólo devuelve la propuesta; se guarda con el form.
+router.post('/redactar', requireAtLeastAtencionCliente, async (req, res) => {
+  res.json(await redactarNovedad(req.body ?? {}));
 });
 
 router.put('/:id', requireAtLeastAtencionCliente, async (req, res) => {

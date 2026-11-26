@@ -51,7 +51,7 @@ function partes(d) {
   }).formatToParts(d).map(x => [x.type, x.value]));
   return { dia: `${p.weekday} ${p.day}/${p.month}`, hora: `${p.hour}:${p.minute}` };
 }
-const fmtFecha = (d) => { const p = partes(d); return `${p.dia}, ${p.hora} h`; };
+export const fmtFecha = (d) => { const p = partes(d); return `${p.dia}, ${p.hora} h`; };
 const capital = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** Normaliza un boceto que viene del panel o de la IA (nunca confía en el largo). */

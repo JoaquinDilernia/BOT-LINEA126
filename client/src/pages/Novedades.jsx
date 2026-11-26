@@ -38,6 +38,9 @@ export default function Novedades() {
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
   const [piezaDe, setPiezaDe] = useState(null);
+  const [ordenando, setOrdenando] = useState(false);
+  const [antes, setAntes] = useState(null); // lo que había antes de "Ordenar con IA", para deshacer
+  const [avisoIA, setAvisoIA] = useState('');
 
   useEffect(() => { load(); }, []);
 
@@ -89,6 +92,42 @@ export default function Novedades() {
     if (r.ok) load();
   }
 
+  // El equipo escribe el detalle como le sale y la IA lo deja claro (y arma
+  // el título si falta). Sólo cambia el form: se guarda con "Guardar".
+  async function ordenar() {
+    setOrdenando(true);
+    setAvisoIA('');
+    try {
+      const r = await authFetch(`${BASE_URL}/api/novedades/redactar`, {
+        method: 'POST',
+        body: {
+          tipo: editing.tipo, titulo: editing.titulo, texto: editing.texto,
+          desde: editing.desde ? new Date(editing.desde).toISOString() : null,
+          hasta: editing.hasta ? new Date(editing.hasta).toISOString() : null,
+        },
+      });
+      const data = r.ok ? await r.json() : null;
+      if (!data?.ia) { setAvisoIA('La IA no está disponible ahora. Probá de nuevo en un rato.'); return; }
+      setAntes({ titulo: editing.titulo, texto: editing.texto });
+      setEditing((e) => ({ ...e, titulo: data.titulo, texto: data.texto }));
+    } catch {
+      setAvisoIA('No se pudo conectar. Probá de nuevo.');
+    } finally {
+      setOrdenando(false);
+    }
+  }
+
+  function deshacer() {
+    setEditing((e) => ({ ...e, ...antes }));
+    setAntes(null);
+  }
+
+  function abrir(n) {
+    setAntes(null);
+    setAvisoIA('');
+    setEditing(n);
+  }
+
   const set = (k) => (e) => setEditing({ ...editing, [k]: e.target.type === 'checkbox' ? e.target.checked : e.target.value });
 
   return (
@@ -99,7 +138,7 @@ export default function Novedades() {
           <h1 className={styles.title}>Novedades</h1>
           <p className={styles.subtitle}>Desvíos, cortes, paros y avisos. Lo vigente aparece en el banner del sitio y el asistente lo usa para responder.</p>
         </div>
-        <button className={styles.primaryBtn} onClick={() => setEditing({ ...EMPTY })}>+ Nueva novedad</button>
+        <button className={styles.primaryBtn} onClick={() => abrir({ ...EMPTY })}>+ Nueva novedad</button>
       </header>
 
       {editing && (
@@ -125,10 +164,20 @@ export default function Novedades() {
               <span>Título — lo que se lee en el banner</span>
               <input value={editing.titulo} onChange={set('titulo')} maxLength={140} placeholder="Ej: Ramal A desviado por obras en Av. Directorio" />
             </label>
-            <label className={styles.field}>
-              <span>Detalle</span>
-              <textarea rows={4} value={editing.texto} onChange={set('texto')} placeholder="Ej: Entre Larrazábal y Escalada sigue por Av. Eva Perón. Las paradas de Directorio quedan sin servicio en ese tramo." />
-            </label>
+            <div className={styles.field}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                <label htmlFor="novedad-texto">Detalle — escribilo como te salga y tocá "Ordenar con IA"</label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {antes && <button type="button" className={styles.ghostBtn} onClick={deshacer} disabled={ordenando}>Deshacer</button>}
+                  <button type="button" className={styles.ghostBtn} onClick={ordenar} disabled={ordenando || saving || (!editing.texto.trim() && !editing.titulo.trim())}>
+                    {ordenando ? 'Ordenando…' : '✨ Ordenar con IA'}
+                  </button>
+                </div>
+              </div>
+              <textarea id="novedad-texto" rows={4} value={editing.texto} onChange={set('texto')} disabled={ordenando} placeholder="Ej: ramal a desviado x obras en directorio entre larrazabal y escalada, va x eva peron. paradas de directorio sin servicio" />
+              {antes && <small>Revisá que esté todo bien antes de guardar. Si no te gusta, tocá "Deshacer".</small>}
+              {avisoIA && <small style={{ color: 'var(--color-error)' }}>{avisoIA}</small>}
+            </div>
             <div className={styles.actions} style={{ justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                 <label className={styles.check}><input type="checkbox" checked={editing.activo} onChange={set('activo')} /> Publicada</label>
@@ -167,7 +216,7 @@ export default function Novedades() {
                 <div className={styles.itemActions}>
                   <button className={styles.ghostBtn} onClick={() => quick(n, { activo: n.activo === false })}>{n.activo === false ? 'Publicar' : 'Despublicar'}</button>
                   <button className={styles.ghostBtn} onClick={() => setPiezaDe(paraPieza(n))}>{n.pieza ? 'Imágenes ✓' : 'Imágenes'}</button>
-                  <button className={styles.ghostBtn} onClick={() => setEditing({ ...EMPTY, ...n, crearImagen: false, desde: toLocalInput(n.desde), hasta: toLocalInput(n.hasta) })}>Editar</button>
+                  <button className={styles.ghostBtn} onClick={() => abrir({ ...EMPTY, ...n, crearImagen: false, desde: toLocalInput(n.desde), hasta: toLocalInput(n.hasta) })}>Editar</button>
                   <button className={styles.dangerBtn} onClick={() => remove(n)}>Borrar</button>
                 </div>
               </article>
