@@ -136,8 +136,8 @@ function drawCover(ctx, img, x, y, w, h) {
 
 // ---- header de la empresa ---------------------------------------------------
 // Como las piezas que ya publica la línea: franja negra arriba con
-// "Cardenas S.A. | LÍNEA 126" en itálica (el 126 grande, rojo con borde
-// blanco) y una curva roja que la separa del fondo.
+// "Cardenas S.A. | LÍNEA 126" (logo oficial) y una curva roja que la separa
+// del fondo.
 
 const SKEW = -0.2; // inclinación de la itálica
 
@@ -153,7 +153,50 @@ function marcaParts(ctx, h) {
   return { wCard, g1, xDiv, xLinea, x126, total: x126 + w126 + h * 0.12 };
 }
 
-/** Logo dibujado: "Cardenas S.A. | LÍNEA 126", centrado en cx, de alto h. */
+// Logo oficial (PNG transparentes en /marca, los pasó la empresa). Se
+// cargan con loadFuentes(); si no llegan, se usa la versión dibujada.
+const MARCA_SRC = { cardenas: '/marca/cardenas.png', linea: '/marca/linea126.png' };
+let marcaImgs = null;
+
+async function loadMarca(srcs = MARCA_SRC) {
+  const load = (src) => new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = src;
+  });
+  try {
+    const [cardenas, linea] = await Promise.all([load(srcs.cardenas), load(srcs.linea)]);
+    marcaImgs = { cardenas, linea };
+  } catch {
+    marcaImgs = null;
+  }
+}
+
+/** "Cardenas S.A. | LÍNEA 126" con los PNG oficiales, centrado en cx, de alto h. */
+function drawMarcaImg(ctx, cx, yTop, h, maxW) {
+  const { cardenas, linea } = marcaImgs;
+  const hc = h * 0.8; // "Cardenas" un poco más chico que el 126, como en sus piezas
+  const wc = cardenas.width * hc / cardenas.height;
+  const wl = linea.width * h / linea.height;
+  const gap = h * 0.22; const div = Math.max(2, h * 0.035);
+  let total = wc + gap * 2 + div + wl;
+  const k = Math.min(1, maxW / total);
+  const H = h * k; total *= k;
+  let x = cx - total / 2;
+  ctx.drawImage(cardenas, x, yTop + (H - hc * k) / 2, wc * k, hc * k);
+  x += (wc + gap) * k;
+  ctx.save();
+  ctx.translate(x, yTop);
+  ctx.transform(1, 0, SKEW, 1, -SKEW * H * 0.9, 0);
+  ctx.fillStyle = WHITE;
+  ctx.fillRect(0, H * 0.08, div * k, H * 0.84);
+  ctx.restore();
+  x += (div + gap) * k;
+  ctx.drawImage(linea, x, yTop, wl * k, H);
+}
+
+/** Logo dibujado (respaldo): "Cardenas S.A. | LÍNEA 126", centrado en cx, de alto h. */
 function drawMarca(ctx, cx, yTop, h, maxW) {
   let m = marcaParts(ctx, h);
   const k = Math.min(1, maxW / m.total);
@@ -225,7 +268,7 @@ function drawHeader(ctx, f) {
   ctx.bezierCurveTo(w * 0.62, H - d * 0.2, w * 0.35, H + d * 0.9, 0, H);
   ctx.closePath(); ctx.fill();
 
-  drawMarca(ctx, w / 2, top + cfg.pad, cfg.logo, w - 120);
+  (marcaImgs ? drawMarcaImg : drawMarca)(ctx, w / 2, top + cfg.pad, cfg.logo, w - 200);
   return H + d + t + 8;
 }
 
@@ -501,10 +544,12 @@ export function renderPieza(canvas, formato, pieza, { tipo = 'info', foto = null
   else drawVertical(ctx, formato, pieza, tema, foto);
 }
 
-/** Carga las fuentes de la marca antes de dibujar (si no, el canvas usa la del sistema). */
-export async function loadFuentes() {
-  if (!document.fonts?.load) return;
-  await Promise.all(FUENTES.map(f => document.fonts.load(f, 'LÍNEA 126 áéíóúñ').catch(() => {})));
+/** Carga las fuentes y el logo antes de dibujar. `marca` permite pasar otras URLs (pruebas). */
+export async function loadFuentes({ marca } = {}) {
+  await Promise.all([
+    loadMarca(marca),
+    ...(document.fonts?.load ? FUENTES.map(f => document.fonts.load(f, 'LÍNEA 126 áéíóúñ').catch(() => {})) : []),
+  ]);
 }
 
 export function canvasToBlob(canvas) {

@@ -2,8 +2,8 @@
 // - assets con hash (/assets/*): cache-first;
 // - la página: network-first con copia offline;
 // - la API (chat, reclamos, recorridos): nunca se cachea acá.
-const VERSION = 'l126-v2';
-const SHELL = ['/', '/favicon.svg', '/manifest.webmanifest'];
+const VERSION = 'l126-v3';
+const SHELL = ['/', '/favicon-32.png', '/manifest.webmanifest'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
