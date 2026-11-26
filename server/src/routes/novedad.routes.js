@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { requireAtLeastAtencionCliente } from '../middleware/requireAuth.js';
 import { getAllNovedades, createNovedad, updateNovedad, deleteNovedad, TIPOS_NOVEDAD } from '../services/novedad.service.js';
+import { sugerirPieza } from '../services/novedadPieza.service.js';
 
 const router = Router();
 
@@ -18,6 +19,12 @@ router.post('/', requireAtLeastAtencionCliente, async (req, res) => {
   } catch (err) {
     res.status(err.status ?? 500).json({ error: err.message });
   }
+});
+
+// Boceto de la imagen para redes armado por la IA a partir de la novedad
+// (recibe los datos en el body, así sirve también antes de guardarla).
+router.post('/pieza/sugerir', requireAtLeastAtencionCliente, async (req, res) => {
+  res.json(await sugerirPieza(req.body ?? {}));
 });
 
 router.put('/:id', requireAtLeastAtencionCliente, async (req, res) => {

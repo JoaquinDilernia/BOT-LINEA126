@@ -1,4 +1,5 @@
 import { getDb } from './firebase.service.js';
+import { cleanPieza } from './novedadPieza.service.js';
 
 const COLLECTION = 'bot-linea126_novedades';
 
@@ -21,7 +22,7 @@ const validDate = (v) => {
   return Number.isNaN(d.getTime()) ? null : d;
 };
 
-function clean({ tipo, titulo, texto, desde, hasta, activo, destacado } = {}) {
+function clean({ tipo, titulo, texto, desde, hasta, activo, destacado, pieza } = {}) {
   const out = {};
   if (tipo !== undefined) out.tipo = TIPOS_NOVEDAD[tipo] ? tipo : 'info';
   if (titulo !== undefined) out.titulo = String(titulo).trim().slice(0, 140);
@@ -30,6 +31,8 @@ function clean({ tipo, titulo, texto, desde, hasta, activo, destacado } = {}) {
   if (hasta !== undefined) out.hasta = validDate(hasta);
   if (activo !== undefined) out.activo = !!activo;
   if (destacado !== undefined) out.destacado = !!destacado;
+  // Boceto de la imagen para redes (textos, no la imagen: esa se dibuja en el panel).
+  if (pieza !== undefined) out.pieza = pieza ? { ...cleanPieza(pieza), updatedAt: new Date() } : null;
   return out;
 }
 

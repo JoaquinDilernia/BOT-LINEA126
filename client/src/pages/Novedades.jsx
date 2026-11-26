@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
 import { authFetch, BASE_URL } from '../lib/api';
 import { toDate } from '../lib/reclamos';
+import PiezaEditor from '../components/PiezaEditor';
 import styles from './Gestion.module.css';
 
 // Novedades: desvíos, cortes, paros y datos de la empresa. Lo vigente sale
 // en el banner del sitio y el asistente lo usa para responder.
 
-const EMPTY = { tipo: 'desvio', titulo: '', texto: '', desde: '', hasta: '', activo: true, destacado: false };
+const EMPTY = { tipo: 'desvio', titulo: '', texto: '', desde: '', hasta: '', activo: true, destacado: false, crearImagen: true };
+
+// Lo que necesita el editor de imágenes (fechas como ISO, no Timestamp de Firestore).
+const paraPieza = (n) => ({
+  id: n.id, tipo: n.tipo, titulo: n.titulo, texto: n.texto ?? '', pieza: n.pieza ?? null,
+  desde: toDate(n.desde)?.toISOString() ?? null, hasta: toDate(n.hasta)?.toISOString() ?? null,
+});
 
 // Date → valor de <input type="datetime-local"> en hora local.
 function toLocalInput(ts) {
@@ -30,6 +37,7 @@ export default function Novedades() {
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [piezaDe, setPiezaDe] = useState(null);
 
   useEffect(() => { load(); }, []);
 
@@ -51,14 +59,20 @@ export default function Novedades() {
     if (!editing.titulo.trim()) return;
     setSaving(true);
     try {
+      const { crearImagen, pieza: _pieza, ...datos } = editing;
       const body = {
-        ...editing,
+        ...datos,
         desde: editing.desde ? new Date(editing.desde).toISOString() : null,
         hasta: editing.hasta ? new Date(editing.hasta).toISOString() : null,
       };
       const url = editing.id ? `${BASE_URL}/api/novedades/${editing.id}` : `${BASE_URL}/api/novedades`;
       const r = await authFetch(url, { method: editing.id ? 'PUT' : 'POST', body });
-      if (r.ok) { setEditing(null); load(); }
+      if (r.ok) {
+        const { novedad } = await r.json();
+        setEditing(null);
+        load();
+        if (crearImagen && novedad) setPiezaDe(paraPieza(novedad));
+      }
     } finally {
       setSaving(false);
     }
@@ -79,6 +93,7 @@ export default function Novedades() {
 
   return (
     <div className={styles.page} style={{ maxWidth: 880 }}>
+      {piezaDe && <PiezaEditor novedad={piezaDe} onClose={() => setPiezaDe(null)} onSaved={load} />}
       <header className={styles.header}>
         <div>
           <h1 className={styles.title}>Novedades</h1>
@@ -118,6 +133,7 @@ export default function Novedades() {
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                 <label className={styles.check}><input type="checkbox" checked={editing.activo} onChange={set('activo')} /> Publicada</label>
                 <label className={styles.check}><input type="checkbox" checked={editing.destacado} onChange={set('destacado')} /> Destacada (aviso emergente en el sitio)</label>
+                <label className={styles.check}><input type="checkbox" checked={editing.crearImagen} onChange={set('crearImagen')} /> {editing.pieza ? 'Abrir las imágenes para redes' : 'Crear también las imágenes para redes'}</label>
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button className={styles.ghostBtn} onClick={() => setEditing(null)} disabled={saving}>Cancelar</button>
@@ -150,7 +166,8 @@ export default function Novedades() {
                 </div>
                 <div className={styles.itemActions}>
                   <button className={styles.ghostBtn} onClick={() => quick(n, { activo: n.activo === false })}>{n.activo === false ? 'Publicar' : 'Despublicar'}</button>
-                  <button className={styles.ghostBtn} onClick={() => setEditing({ ...EMPTY, ...n, desde: toLocalInput(n.desde), hasta: toLocalInput(n.hasta) })}>Editar</button>
+                  <button className={styles.ghostBtn} onClick={() => setPiezaDe(paraPieza(n))}>{n.pieza ? 'Imágenes ✓' : 'Imágenes'}</button>
+                  <button className={styles.ghostBtn} onClick={() => setEditing({ ...EMPTY, ...n, crearImagen: false, desde: toLocalInput(n.desde), hasta: toLocalInput(n.hasta) })}>Editar</button>
                   <button className={styles.dangerBtn} onClick={() => remove(n)}>Borrar</button>
                 </div>
               </article>
