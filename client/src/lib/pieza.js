@@ -2,15 +2,16 @@
 // mismo boceto (etiqueta, titular, bajada, puntos, cuándo, cierre) en cada
 // medida, con la identidad de la campaña de lanzamiento (Linea126_Lanzamiento):
 // fondos llenos rojo/negro/blanco, Inter Display Black en mayúsculas con el
-// punto final, kicker espaciado, logo en pastilla y foto con corte diagonal.
+// punto final, kicker espaciado, header de la empresa (franja negra con
+// "Cardenas S.A. | LÍNEA 126" y curva roja) y foto con corte diagonal.
 // Los textos los escribe la persona (o los sugiere la IA); el diseño es fijo,
 // así las calles y horarios salen tal cual.
 
 export const FORMATOS = [
   // IG tapa ~250 px arriba (barra de progreso, perfil) y ~300 abajo (responder).
-  { id: 'historia', label: 'Historia IG · Estado WhatsApp', medida: '1080 × 1920', w: 1080, h: 1920, safeTop: 200, safeBottom: 250, fotoH: 900 },
-  { id: 'post', label: 'Post IG · Facebook', medida: '1080 × 1350', w: 1080, h: 1350, safeTop: 0, safeBottom: 0, fotoH: 500 },
-  { id: 'cuadrado', label: 'Cuadrado · WhatsApp, Facebook', medida: '1080 × 1080', w: 1080, h: 1080, safeTop: 0, safeBottom: 0, fotoH: 380 },
+  { id: 'historia', label: 'Historia IG · Estado WhatsApp', medida: '1080 × 1920', w: 1080, h: 1920, safeTop: 200, safeBottom: 250, fotoH: 1000 },
+  { id: 'post', label: 'Post IG · Facebook', medida: '1080 × 1350', w: 1080, h: 1350, safeTop: 0, safeBottom: 0, fotoH: 580 },
+  { id: 'cuadrado', label: 'Cuadrado · WhatsApp, Facebook', medida: '1080 × 1080', w: 1080, h: 1080, safeTop: 0, safeBottom: 0, fotoH: 440 },
   { id: 'horizontal', label: 'Horizontal · Facebook, X, web', medida: '1200 × 630', w: 1200, h: 630 },
 ];
 
@@ -24,19 +25,19 @@ export const FONDOS = { auto: 'Automático (según el tipo)', rojo: 'Rojo', negr
 const TEMAS = {
   rojo: {
     bg: RED, text: WHITE, sub: 'rgba(255,255,255,.9)', dot: WHITE, kicker: 'rgba(255,255,255,.82)', kickerPill: null,
-    logo: { bg: WHITE, fg: RED, sub: null }, cuando: { bg: INK, fg: WHITE, icon: '#ff4a4a' },
+    cuando: { bg: INK, fg: WHITE, icon: '#ff4a4a' },
     punto: { bg: 'rgba(0,0,0,.16)', fg: WHITE, marker: WHITE }, cierre: { block: null, label: 'rgba(255,255,255,.75)', fg: WHITE },
     marca: 'rgba(255,255,255,.07)',
   },
   negro: {
     bg: INK, text: WHITE, sub: '#c9c9c9', dot: RED_DOT, kicker: '#ff4d4d', kickerPill: null,
-    logo: { bg: RED, fg: WHITE, sub: null }, cuando: { bg: RED, fg: WHITE, icon: WHITE },
+    cuando: { bg: RED, fg: WHITE, icon: WHITE },
     punto: { bg: 'rgba(255,255,255,.07)', fg: WHITE, marker: RED_DOT }, cierre: { block: null, label: '#ff4d4d', fg: WHITE },
     marca: 'rgba(255,255,255,.05)',
   },
   blanco: {
     bg: WHITE, text: INK, sub: '#4a4a4a', dot: RED, kicker: WHITE, kickerPill: INK,
-    logo: { bg: RED, fg: WHITE, sub: '#555555' }, cuando: { bg: INK, fg: WHITE, icon: '#ff4a4a' },
+    cuando: { bg: INK, fg: WHITE, icon: '#ff4a4a' },
     punto: { bg: '#f4f4f4', fg: INK, marker: RED }, cierre: { block: RED, label: 'rgba(255,255,255,.85)', fg: WHITE },
     marca: 'rgba(200,18,26,.06)',
   },
@@ -133,26 +134,99 @@ function drawCover(ctx, img, x, y, w, h) {
   ctx.drawImage(img, (img.width - sw) / 2, (img.height - sh) / 2, sw, sh, x, y, w, h);
 }
 
-// Pastilla "LÍNEA 126" (+ "Cárdenas S.A." al lado en fondo blanco).
-function drawLogo(ctx, x, y, h, tema, { forceWhite = false } = {}) {
-  const logo = forceWhite ? { bg: WHITE, fg: RED, sub: null } : tema.logo;
-  const size = h * 0.56;
-  setFont(ctx, 900, size);
-  const sp = -size * 0.035;
-  const tw = width(ctx, 'LÍNEA 126', sp);
-  const padX = h * 0.3;
-  roundRect(ctx, x, y, tw + padX * 2, h, h * 0.22);
-  ctx.fillStyle = logo.bg;
-  ctx.fill();
-  ctx.fillStyle = logo.fg;
-  ctx.textBaseline = 'middle';
-  text(ctx, 'LÍNEA 126', x + padX, y + h * 0.53, sp);
-  if (logo.sub) {
-    setFont(ctx, 600, h * 0.44);
-    ctx.fillStyle = logo.sub;
-    text(ctx, 'Cárdenas S.A.', x + tw + padX * 2 + h * 0.35, y + h * 0.53);
-  }
+// ---- header de la empresa ---------------------------------------------------
+// Como las piezas que ya publica la línea: franja negra arriba con
+// "Cardenas S.A. | LÍNEA 126" en itálica (el 126 grande, rojo con borde
+// blanco) y una curva roja que la separa del fondo.
+
+const SKEW = -0.2; // inclinación de la itálica
+
+function marcaParts(ctx, h) {
+  setFont(ctx, 900, h * 0.4); const wCard = width(ctx, 'Cardenas');
+  setFont(ctx, 900, h * 0.24); const wSA = width(ctx, 'S.A.');
+  setFont(ctx, 800, h * 0.27); const wLinea = width(ctx, 'LÍNEA', h * 0.01);
+  setFont(ctx, 900, h * 0.95); const w126 = width(ctx, '126', -h * 0.03);
+  const g1 = wCard + h * 0.1 + wSA;
+  const xDiv = g1 + h * 0.2;
+  const xLinea = xDiv + h * 0.04 + h * 0.2;
+  const x126 = xLinea + wLinea + h * 0.1;
+  return { wCard, g1, xDiv, xLinea, x126, total: x126 + w126 + h * 0.12 };
+}
+
+/** Logo dibujado: "Cardenas S.A. | LÍNEA 126", centrado en cx, de alto h. */
+function drawMarca(ctx, cx, yTop, h, maxW) {
+  let m = marcaParts(ctx, h);
+  const k = Math.min(1, maxW / m.total);
+  h *= k; m = marcaParts(ctx, h);
+  ctx.save();
+  ctx.translate(cx - m.total / 2, yTop);
+  ctx.transform(1, 0, SKEW, 1, -SKEW * h * 0.86, 0); // itálica con la base en el 126
   ctx.textBaseline = 'alphabetic';
+
+  // Cardenas S.A. + subrayado rojo en punta
+  ctx.fillStyle = WHITE;
+  setFont(ctx, 900, h * 0.4); text(ctx, 'Cardenas', 0, h * 0.58);
+  setFont(ctx, 900, h * 0.24); text(ctx, 'S.A.', m.wCard + h * 0.1, h * 0.58);
+  ctx.fillStyle = RED_DOT;
+  ctx.beginPath();
+  ctx.moveTo(h * 0.04, h * 0.7);
+  ctx.quadraticCurveTo(m.g1 * 0.5, h * 0.6, m.g1, h * 0.64);
+  ctx.quadraticCurveTo(m.g1 * 0.55, h * 0.67, h * 0.04, h * 0.76);
+  ctx.closePath(); ctx.fill();
+
+  // separador
+  ctx.fillStyle = WHITE;
+  ctx.fillRect(m.xDiv, h * 0.12, Math.max(2, h * 0.035), h * 0.74);
+
+  // LÍNEA
+  setFont(ctx, 800, h * 0.27); text(ctx, 'LÍNEA', m.xLinea, h * 0.6, h * 0.01);
+
+  // 126 rojo con borde blanco
+  setFont(ctx, 900, h * 0.95);
+  if ('letterSpacing' in ctx) ctx.letterSpacing = `${-h * 0.03}px`;
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = h * 0.09; ctx.strokeStyle = WHITE;
+  ctx.strokeText('126', m.x126, h * 0.86);
+  ctx.fillStyle = RED;
+  ctx.fillText('126', m.x126, h * 0.86);
+  if ('letterSpacing' in ctx) ctx.letterSpacing = '0px';
+  ctx.restore();
+}
+
+const HEADER = {
+  historia: { logo: 130, pad: 44 },
+  post: { logo: 112, pad: 40 },
+  cuadrado: { logo: 96, pad: 32 },
+  horizontal: { logo: 62, pad: 20 },
+};
+
+/**
+ * Franja negra con el logo y la curva roja abajo. Devuelve el y más bajo
+ * de la curva (desde ahí arranca el contenido).
+ */
+function drawHeader(ctx, f) {
+  const { w } = f;
+  const cfg = HEADER[f.id];
+  const top = f.safeTop ?? 0;
+  const H = top + cfg.pad * 2 + cfg.logo; // alto de la franja (en el borde izquierdo)
+  const d = Math.round(w * (f.id === 'horizontal' ? 0.03 : 0.045)); // cuánto baja la curva
+  const t = Math.round(w * (f.id === 'horizontal' ? 0.02 : 0.03)); // grosor de la cinta roja
+  // cinta blanca fina + roja (de más ancha a la izquierda a más finita a la derecha)
+  ctx.fillStyle = WHITE;
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, 0); ctx.lineTo(w, H + d + t * 0.55 + 6);
+  ctx.bezierCurveTo(w * 0.62, H - d * 0.2 + t + 8, w * 0.35, H + d * 0.9 + t + 8, 0, H + t + 8);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = RED;
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, 0); ctx.lineTo(w, H + d + t * 0.35);
+  ctx.bezierCurveTo(w * 0.62, H - d * 0.2 + t, w * 0.35, H + d * 0.9 + t, 0, H + t);
+  ctx.closePath(); ctx.fill();
+  ctx.fillStyle = INK;
+  ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(w, 0); ctx.lineTo(w, H + d);
+  ctx.bezierCurveTo(w * 0.62, H - d * 0.2, w * 0.35, H + d * 0.9, 0, H);
+  ctx.closePath(); ctx.fill();
+
+  drawMarca(ctx, w / 2, top + cfg.pad, cfg.logo, w - 120);
+  return H + d + t + 8;
 }
 
 function drawClock(ctx, cx, cy, r, color) {
@@ -336,10 +410,10 @@ function drawBlocks(ctx, m, x, y) {
 }
 
 const BASE = {
-  historia: { kicker: 34, titular: 150, bajada: 46, punto: 40, cuando: 40, cierre: 64, logo: 70 },
-  post: { kicker: 30, titular: 128, bajada: 40, punto: 35, cuando: 35, cierre: 54, logo: 62 },
-  cuadrado: { kicker: 26, titular: 112, bajada: 35, punto: 31, cuando: 31, cierre: 46, logo: 56 },
-  horizontal: { kicker: 18, titular: 72, bajada: 24, punto: 21, cuando: 21, cierre: 30, logo: 44 },
+  historia: { kicker: 34, titular: 150, bajada: 46, punto: 40, cuando: 40, cierre: 64 },
+  post: { kicker: 30, titular: 128, bajada: 40, punto: 35, cuando: 35, cierre: 54 },
+  cuadrado: { kicker: 26, titular: 112, bajada: 35, punto: 31, cuando: 31, cierre: 46 },
+  horizontal: { kicker: 18, titular: 72, bajada: 24, punto: 21, cuando: 21, cierre: 30 },
 };
 
 function drawVertical(ctx, f, pieza, tema, foto) {
@@ -351,7 +425,7 @@ function drawVertical(ctx, f, pieza, tema, foto) {
 
   let top;
   if (foto) {
-    // Foto arriba y el fondo entra en diagonal (sube hacia la derecha), como Historia_01.
+    // Foto debajo del header y el fondo entra en diagonal (sube hacia la derecha), como Historia_01.
     const fh = f.fotoH;
     const cut = w * 0.13;
     drawCover(ctx, foto, 0, 0, w, fh);
@@ -359,11 +433,10 @@ function drawVertical(ctx, f, pieza, tema, foto) {
     ctx.beginPath();
     ctx.moveTo(0, fh); ctx.lineTo(w, fh - cut); ctx.lineTo(w, h); ctx.lineTo(0, h);
     ctx.closePath(); ctx.fill();
-    drawLogo(ctx, P, f.safeTop + 50, base.logo * 0.8, tema, { forceWhite: true });
+    drawHeader(ctx, f);
     top = fh + 50;
   } else {
-    drawLogo(ctx, P, f.safeTop + 80, base.logo, tema);
-    top = f.safeTop + 80 + base.logo + 90;
+    top = drawHeader(ctx, f) + 70;
   }
 
   const cierre = measureCierre(ctx, pieza, tema, w - P * 2, base);
@@ -401,18 +474,18 @@ function drawHorizontal(ctx, f, pieza, tema, foto) {
     ctx.fillStyle = tema.marca;
     setFont(ctx, 900, h * 1.05);
     const mw = width(ctx, '126', -h * 0.05);
-    text(ctx, '126', w - mw * 0.86, h * 0.93, -h * 0.05);
+    text(ctx, '126', w - mw * 0.86, h * 1.02, -h * 0.05);
     maxW = w * 0.66 - P;
   }
 
-  drawLogo(ctx, P, P - 8, base.logo, tema);
+  const headerBottom = drawHeader(ctx, f);
   // En horizontal el cierre va sin bloque (no hay alto para eso).
   const temaCierre = tema.cierre.block ? { ...tema, cierre: { block: null, label: RED, fg: INK } } : tema;
   const cierre = measureCierre(ctx, pieza, temaCierre, maxW, base);
   const footTop = h - P - cierre.h + 10;
   cierre.draw(P, footTop);
 
-  const top = P - 8 + base.logo + 34;
+  const top = headerBottom + 22;
   const bottom = footTop - 30;
   const m = fitContent(ctx, pieza, tema, maxW, bottom - top, base);
   drawBlocks(ctx, m, P, top + Math.max(0, (bottom - top - m.total) / 2));
