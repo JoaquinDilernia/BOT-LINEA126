@@ -178,13 +178,13 @@ export default function Novedades() {
               {antes && <small>Revisá que esté todo bien antes de guardar. Si no te gusta, tocá "Deshacer".</small>}
               {avisoIA && <small style={{ color: 'var(--color-error)' }}>{avisoIA}</small>}
             </div>
-            <div className={styles.actions} style={{ justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+            <div className={`${styles.actions} ${styles.novedadActions}`}>
+              <div className={styles.novedadChecks}>
                 <label className={styles.check}><input type="checkbox" checked={editing.activo} onChange={set('activo')} /> Publicada</label>
                 <label className={styles.check}><input type="checkbox" checked={editing.destacado} onChange={set('destacado')} /> Destacada (aviso emergente en el sitio)</label>
                 <label className={styles.check}><input type="checkbox" checked={editing.crearImagen} onChange={set('crearImagen')} /> {editing.pieza ? 'Abrir las imágenes para redes' : 'Crear también las imágenes para redes'}</label>
               </div>
-              <div style={{ display: 'flex', gap: 8 }}>
+              <div className={styles.novedadBtns}>
                 <button className={styles.ghostBtn} onClick={() => setEditing(null)} disabled={saving}>Cancelar</button>
                 <button className={styles.primaryBtn} onClick={save} disabled={saving || !editing.titulo.trim()}>{saving ? 'Guardando…' : 'Guardar'}</button>
               </div>
