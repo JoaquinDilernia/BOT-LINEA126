@@ -49,3 +49,22 @@ test('buildSystemPrompt: las novedades van fuera del bloque cacheado', () => {
   assert.doesNotMatch(blocks[0].text, /Paro de UTA/);
   assert.match(blocks[1].text, /NOVEDADES VIGENTES[\s\S]*Paro de UTA/);
 });
+
+// Incidente 2026-11-27: Sonnet 5 piensa por defecto y el razonamiento cuenta
+// dentro de max_tokens. Con 1024, las preguntas del expreso agotaban el tope
+// pensando y la respuesta llegaba sin texto → el pasajero no recibía nada.
+import { extractReply, BOT_REPLY_MAX_TOKENS } from './claude.service.js';
+
+test('extractReply: devuelve el texto ignorando bloques thinking', () => {
+  const r = { stop_reason: 'end_turn', content: [{ type: 'thinking', thinking: '' }, { type: 'text', text: ' Hola ' }] };
+  assert.equal(extractReply(r), 'Hola');
+});
+
+test('extractReply: respuesta sin texto (cortada por max_tokens) tira error en vez de devolver ""', () => {
+  const r = { stop_reason: 'max_tokens', content: [{ type: 'thinking', thinking: '' }] };
+  assert.throws(() => extractReply(r), /max_tokens/);
+});
+
+test('BOT_REPLY_MAX_TOKENS deja lugar para pensar y responder', () => {
+  assert.ok(BOT_REPLY_MAX_TOKENS >= 8000);
+});

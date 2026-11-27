@@ -275,7 +275,9 @@ async function processIncomingMessageInternal(msg) {
     });
   } catch (err) {
     console.error(`[bot] Claude falló definitivamente para ${from} tras reintentos:`, err.message);
-    const fallbackMsg = 'Estamos con un poquito de demora en este momento, ¡ya te contestamos! 🙏';
+    const fallbackMsg = err.emptyReply
+      ? 'Perdón, no pude armar bien la respuesta a esa consulta 🙏 ¿Me la escribís de nuevo, con un poco más de detalle (ramal, parada o destino)?'
+      : 'Estamos con un poquito de demora en este momento, ¡ya te contestamos! 🙏';
     await appendMessage(from, { role: 'assistant', content: fallbackMsg });
     await setUrgentFlag(from, true).catch(() => {});
     if (channel === 'whatsapp') await sendWhatsAppMessage(from, fallbackMsg).catch(() => {});

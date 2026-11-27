@@ -16,6 +16,26 @@ function extractText(response) {
     .trim();
 }
 
+// Sonnet 5 piensa por defecto y ese razonamiento cuenta dentro de max_tokens.
+// Con 1024 las consultas complejas (expreso + paradas + tarifa) agotaban el
+// tope pensando y la respuesta salía vacía o cortada (incidente 2026-11-27).
+export const BOT_REPLY_MAX_TOKENS = 8000;
+
+// Una respuesta sin texto nunca se guarda/manda en silencio: se tira error
+// para que bot.service use su mensaje de respaldo y quede en los logs.
+export function extractReply(response) {
+  const text = extractText(response);
+  if (!text) {
+    const err = new Error(`Claude respondió sin texto (stop_reason=${response.stop_reason ?? '?'}, output_tokens=${response.usage?.output_tokens ?? '?'})`);
+    err.emptyReply = true;
+    throw err;
+  }
+  if (response.stop_reason === 'max_tokens') {
+    console.warn(`[claude] Respuesta cortada por max_tokens (${response.usage?.output_tokens} tokens)`);
+  }
+  return text;
+}
+
 function logUsage(usage, type) {
   if (!usage?.input_tokens && !usage?.cache_read_input_tokens) return;
   const cacheWrite = usage.cache_creation_input_tokens ?? 0;
@@ -138,7 +158,7 @@ export async function generateConversationSummary(messages) {
 
   const response = await callAnthropicAPI({
     model: MODEL,
-    max_tokens: 350,
+    max_tokens: 2000,
     system: 'Generás resúmenes breves de conversaciones de atención al cliente en español rioplatense. Respondés SOLO con el resumen, sin encabezados ni listas.',
     messages: [{
       role: 'user',
@@ -157,13 +177,13 @@ export async function generateBotResponse(userMessage, conversationHistory, cont
 
   const response = await callAnthropicAPI({
     model: MODEL,
-    max_tokens: 1024,
+    max_tokens: BOT_REPLY_MAX_TOKENS,
     system: systemContent,
     messages,
   });
 
   logUsage(response.usage, 'bot_reply');
-  return extractText(response);
+  return extractReply(response);
 }
 
 export function buildSystemPrompt(botConfig = {}, knowledgeBase, customerContext, availableLabels = [], tarifario = '', recorridos = '', { reclamos = {}, novedades = '' } = {}) {
